@@ -1,0 +1,368 @@
+<html>
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+<script type="text/javascript" src="gl-matrix-min.js"></script>
+<script type="text/javascript" src="jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src="gx.js"></script>
+<script type="text/javascript" src="gx.shader.js"></script>
+<script type="text/javascript" src="gx.buffer.js"></script>
+<script type="text/javascript" src="gx.texture.js"></script>
+<script type="text/javascript" src="gx.model.js"></script>
+<script type="text/javascript" src="gx.input.js"></script>
+<script type="text/javascript" src="gx.camera.js"></script>
+
+<!-- shaders -->
+<script id="main_frag" type="x-shader/x-fragment" src="shaders\main_fragment.glsl"></script>
+<script id ="main_vert" type="x-shader/x-vertex" src="shaders\main_vertex.glsl"></script>
+<script id="sun_frag" type="x-shader/x-fragment" src="shaders\sun_fragment.glsl"></script>
+<script id ="sun_vert" type="x-shader/x-vertex" src="shaders\sun_vertex.glsl"></script>
+
+<script type="text/javascript">
+
+    Math.PI2 = 2 * Math.PI;
+    
+    var earthRadius = 6371;
+    var moonRadius = 1737.4 / earthRadius;
+    var sunRadius = 1; //(6371 + 6371) / earthRadius;
+    var distanceEarthMoon = 4; //384400 / earthRadius;
+    var moonInclination = (5.14 / 180) * Math.PI; // inclination in relation to the sun's plane
+    var moonObliquity = (6.58 / 180) * Math.PI ; // moon's axial tilt
+
+    var earthRotationPeriod = 0.99726968;
+    var moonTranslationPeriod = 27.321582 / earthRotationPeriod;
+    var moonRotationPeriod = 27.321582 / earthRotationPeriod;
+    var earthSunDistance = 10;// 150 * Math.pow(10, 6) / earthRadius;
+    var earthTranslationPeriod = 365.25 / earthRotationPeriod; // days
+    
+    var shaderPrograms = [];
+    var mvMatrix = mat4.create();
+    var pMatrix = mat4.create();
+    var ambientLightColor = vec3.fromValues(0.3, 0.3, 0.3);
+    var glx;
+    var glxInput;
+    var worldTexture;
+    var moonTexture;
+    var sunTexture;
+    var camera;
+    var lightPosition;
+    
+    var face;
+    var earth;
+    var moon;
+    var sun;
+       
+    function initBuffers() {
+
+        var edgeSize = parseInt(document.getElementById("edges").value);
+        var longEdgeSize = parseInt(document.getElementById("stripes").value);
+    
+        earth = new gx.models.sphere(glx, 1, edgeSize, longEdgeSize);       // earth radius is the normalized measure unit
+        moon = new gx.models.sphere(glx, moonRadius, edgeSize, longEdgeSize);        
+        sun = new gx.models.sphere(glx, sunRadius, edgeSize, longEdgeSize);
+        face = new gx.models.face(glx, vec3.fromValues(-1, 1, 0), vec3.fromValues(1, -1, 0));
+    }
+
+    function moveCameraInput(elapsedTime) {
+        /*var cameraDirection = camera.getForward();
+        var rot90degreeY = mat4.create();
+        mat4.identity(rot90degreeY);
+        mat4.rotateY(rot90degreeY, rot90degreeY, Math.PI / 2);
+        var cameraDirectionOrth = vec3.clone(cameraDirection);
+        vec3.transformMat4(cameraDirectionOrth, cameraDirectionOrth, rot90degreeY);*/
+        
+        var cameraDisplacement = vec3.create();
+        
+        var pitch = 0;
+        var yaw = 0;
+        
+        if (glxInput.isKeyPressed('W')) {
+            cameraDisplacement[2] = 1;
+        } else if (glxInput.isKeyPressed('S')) {
+            cameraDisplacement[2] = -1;
+        } else if (glxInput.isKeyPressed('A')) {
+            cameraDisplacement[0] = -1;
+        } else if (glxInput.isKeyPressed('D')) {
+            cameraDisplacement[0] = 1;
+        } else if  (glxInput.isKeyPressed(37)) { // left arrow
+            yaw = Math.PI * 0.01;
+        } else if (glxInput.isKeyPressed(38)) { // up arrow
+            pitch = Math.PI * 0.01;
+        } else if (glxInput.isKeyPressed(39)) { // right arrow
+            yaw = -Math.PI * 0.01;
+        } else if (glxInput.isKeyPressed(40)) { // down arrow
+            pitch = -Math.PI * 0.01;
+        }
+        
+        if (glxInput.isKeySinglePress(107)) { // plus
+            var v = Math.min(ambientLightColor[0] + 0.1, 1);
+            ambientLightColor[0] = v;
+            ambientLightColor[1] = v;
+            ambientLightColor[2] = v;
+        } else if (glxInput.isKeySinglePress(109)) { // minus
+            var v = Math.max(ambientLightColor[0] - 0.1, 0);
+            ambientLightColor[0] = v;
+            ambientLightColor[1] = v;
+            ambientLightColor[2] = v;
+        }
+        
+        /*else if (glxInput.isKeyPressed('Q')) {
+            camera.position[1] += 0.1; 
+        } else if (glxInput.isKeyPressed('E')) {
+            camera.position[1] -= 0.1; 
+        }*/       
+        
+        var rotationSpeed = Math.PI * 0.04 * elapsedTime;
+        if (glxInput.isLeftButtonPressed()) {            
+            var mouseRelDisp = glxInput.getRelativeMouseDisplacement();
+            pitch = -mouseRelDisp[1] * rotationSpeed;
+            yaw = -mouseRelDisp[0] * rotationSpeed;
+        }
+        
+        var deltaPitch = pitch * rotationSpeed;
+        var deltaYaw = yaw * rotationSpeed;
+        camera.rotate(deltaPitch, deltaYaw);
+        
+        var cameraSpeed = 0.01;
+        vec3.scale(cameraDisplacement, cameraDisplacement, elapsedTime * cameraSpeed);
+        camera.move(cameraDisplacement);
+    }
+    
+    function initialize(canvas) {
+        glx = new gx();
+        glx.initializeWebgl(canvas);
+        glxInput = new gx.input(canvas);        
+        camera = new gx.camera([0, 0, -40]);
+        camera.setTarget([0, 0, 0]);
+        
+        mat4.perspective(pMatrix, 45, glx.canvas.clientWidth / glx.canvas.clientHeight, 0.1, 100.0);
+        
+        var gl = glx.gl;
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        gl.enable(gl.DEPTH_TEST);
+        gl.enable(gl.BLEND);
+    }
+    
+    var moonRotationAroundEarthMatrix = mat4.create();
+    mat4.identity(moonRotationAroundEarthMatrix);
+    
+    function update(currentTime, elapsedTime) {       
+    
+        var earthDayInMilliseconds = 100;
+    
+        // sun - default to 0,0,0
+        sun.position = vec3.fromValues(0, 0, 0);
+        
+        // earth
+        earth.position = calculateOrbitPosition(sun.position, earthSunDistance, 0, earthTranslationPeriod * earthDayInMilliseconds, currentTime);
+        earth.rotation[1] = (currentTime / earthDayInMilliseconds) % Math.PI2;
+        
+        // moon
+        moon.position = calculateOrbitPosition(earth.position, distanceEarthMoon, moonInclination, moonTranslationPeriod * earthDayInMilliseconds, currentTime);
+        moon.rotation[1] = (currentTime / moonRotationPeriod * earthDayInMilliseconds) % Math.PI2;
+    }
+    
+    function calculateOrbitPosition(orbitCenter, orbitDistance, orbitInclination, periodLengthMilliseconds, currentTime) {
+        // puts element on inclined orbit
+        var position = vec3.fromValues(orbitDistance * Math.cos(orbitInclination), orbitDistance * Math.sin(orbitInclination), 0);
+                
+        var matrix = mat4.create();
+        mat4.identity(matrix);                        
+        mat4.rotateY(matrix, matrix, (currentTime / periodLengthMilliseconds) % Math.PI2); // rotates element around center
+        mat4.translate(matrix, matrix, orbitCenter); // translates element to orbit center
+        vec3.transformMat4(position, position, matrix);
+        
+        return position;
+    }
+    
+    function draw(glx, elapsedTime) {
+        var gl = glx.gl;
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+        gl.viewport(0, 0, glx.canvas.width, glx.canvas.height);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        
+        var viewProjectionMatrix = camera.getViewMatrix();        
+        mat4.multiply(viewProjectionMatrix, pMatrix, viewProjectionMatrix);
+        
+        var lightPosition = new Float32Array(sun.position);
+                
+        var shaderProgram = shaderPrograms['main'];
+        drawModel(shaderProgram, earth, worldTexture, viewProjectionMatrix, lightPosition);
+        drawModel(shaderProgram, moon, moonTexture, viewProjectionMatrix, lightPosition);
+                
+        drawModel(shaderProgram, sun, sunTexture, viewProjectionMatrix, lightPosition);
+        
+        shaderProgram = shaderPrograms['sun'];    
+        drawFace(shaderProgram, face);
+    }
+    
+    function transformIntoScreenCoords(position, modelMatrix, viewProjectionMatrix) {
+        var transformedPosition = vec3.create();
+        vec3.transformMat4(transformedPosition, position, modelMatrix);
+        vec3.transformMat4(transformedPosition, transformedPosition, viewProjectionMatrix);
+        vec3.scale(transformedPosition, transformedPosition, 1 / transformedPosition[2]); // make values in range 0..1
+        transformedPosition[0] = (glx.canvas.width / 2) * (transformedPosition[0] + 1);
+        transformedPosition[1] = (glx.canvas.height / 2) * (transformedPosition[1] + 1);
+        return transformedPosition;
+    }
+    
+    function drawFace(shaderProgram, model) {
+        shaderProgram.activate();
+        
+        shaderProgram.uniform2fv("uResolution", new Float32Array(vec2.fromValues(glx.canvas.width, glx.canvas.height)));
+        
+        var modelViewMatrix = model.getModelMatrix();
+        mat4.multiply(modelViewMatrix, camera.getViewMatrix(), modelViewMatrix);
+        shaderProgram.uniformMatrix("uModelViewTransformation", modelViewMatrix);
+
+        shaderProgram.uniform3fv("uSunCenter", new Float32Array(sun.position));        
+        shaderProgram.uniform("uRadius", sunRadius, 'f');
+        
+        var pos = vec4.fromValues(0., 0., 1., 1.);
+        vec4.transformMat4(pos, pos, modelViewMatrix);
+        
+        shaderProgram.attributeBuffer("aVertexPosition", model.modelData.vertexBuffer);
+        shaderProgram.drawElements(model.modelData.indexBuffer);
+    }
+    
+    function drawModel(shaderProgram, model, texture, viewProjectionMatrix, lightPosition) {
+        var modelMatrix = model.getModelMatrix();
+    
+        shaderProgram.activate();
+    
+        shaderProgram.uniformMatrix("uModelMatrix", modelMatrix);
+        shaderProgram.uniformMatrix("uViewProjectionMatrix", viewProjectionMatrix);
+
+        shaderProgram.uniform2fv("uResolution", new Float32Array(glx.canvas.width, glx.canvas.height));
+        
+        var sunCenterUV = transformIntoScreenCoords(model.position, modelMatrix, viewProjectionMatrix);
+        shaderProgram.uniform3fv("uSunCenterUV", new Float32Array(sunCenterUV));        
+        
+        // sunRadius
+        var sunRadiusVec = transformIntoScreenCoords(vec3.fromValues(sunRadius, 0, 0), modelMatrix, viewProjectionMatrix);
+        sunRadiusVec[0] = vec3.distance(sunRadiusVec, sunCenterUV);
+        shaderProgram.uniform3fv("uSunRadiusUV", new Float32Array(sunRadiusVec));
+        
+        //shaderProgram.uniformf("uSunRadius", sunRadius);
+        
+        var normalMatrix = mat3.create();
+        mat3.normalFromMat4(normalMatrix, modelMatrix);        
+        shaderProgram.uniformMatrix("uNormalMatrix", normalMatrix);
+
+        texture.attach(0);
+        shaderProgram.uniform("uSampler2D", 0, 'i');
+    
+        shaderProgram.uniform('uWireframe', document.getElementById("wireframe").checked ? 1.0 : 0.0);
+        shaderProgram.uniform('uWireframeWidth', document.getElementById("wireframeWidth").value);
+        
+        shaderProgram.uniform3fv('uAmbientLightColor', new Float32Array(ambientLightColor));
+        shaderProgram.uniform3fv('uLightPosition', lightPosition);
+        
+        shaderProgram.attributeBuffer("aVertexPosition", model.modelData.vertexBuffer);
+        shaderProgram.attributeBuffer("aTexCoord", model.modelData.texCoordBuffer);
+        shaderProgram.attributeBuffer("aNormal", model.modelData.normalBuffer);
+                   
+        shaderProgram.drawElements(model.modelData.indexBuffer);
+    };
+    
+    var lastTime = Date.now();
+    var lightPosAngle = 0;
+    
+    function drawScene(glx) {        
+        if (!worldTexture || !moonTexture || !sunTexture) {
+            return;
+        }
+        
+        var now = Date.now();
+        var elapsedTime = now - lastTime;
+        lastTime = now;
+        
+        moveCameraInput(elapsedTime);
+        glxInput.tick();
+
+        update(now, elapsedTime);
+        draw(glx, elapsedTime);
+    }
+    
+    function webGLStart() {  
+        var canvas = document.getElementById("lesson01-canvas");
+        initialize(canvas);
+        changeTexture();
+        
+        glx.loadShaders(function (shaders){        
+            loadShader(shaders, 'main', 'main_vert', 'main_frag');
+            loadShader(shaders, 'sun', 'sun_vert', 'sun_frag');
+                        
+            initBuffers(glx);
+
+            window.setInterval(drawScene.bind(this, glx), 16.666);            
+        });
+    }
+    
+    function loadShader(shaders, programName, vertShaderName, fragShaderName) {
+        var program = glx.createShaderProgram(shaders[vertShaderName], shaders[fragShaderName]);;        
+        program.linkProgram();
+        shaderPrograms[programName] = program;
+    }
+
+    function changeTexture() {
+
+        var textureUrl = document.getElementById("textureURL").value;
+        glx.createTexture(textureUrl, function(texture) {
+            worldTexture = texture;
+        });
+        
+        var moonTextureUrl = "moon.bmp";
+        glx.createTexture(moonTextureUrl, function(texture) {
+            moonTexture = texture;
+        });
+        
+        var sunTextureUrl = "sun.jpg";
+        glx.createTexture(sunTextureUrl, function(texture) {
+            sunTexture = texture;
+        });
+    };
+
+
+</script>
+
+
+</head>
+
+
+<body onload="webGLStart();">
+	<img id="texture" src="earth_flat_map.jpg" style="display: none"/>
+
+    <div>
+        <canvas id="lesson01-canvas" style="border: none;width: 1024px;height: 1024px;"
+            width="1024" height="1024"></canvas>
+    </div>
+    <div style="display:none">
+        <br/>
+
+        RotY: <input id="rotationY" type="range" name="points" value="0" min="0" max="360"></input>
+
+        <br/>
+        RotX: <input id="rotationX" type="range" name="points" value="0" min="0" max="360"></input>
+
+        <br/>
+
+        Stripes: <input id="stripes" type='text' value="30" onchange="initBuffers();"></input>
+        <br/>
+
+        Edges: <input id="edges" type='text' value="50" onchange="initBuffers();"></input>
+        <br/>
+        Texture: <input id="textureURL" type='text' value="earth_flat_map.jpg" onchange="changeTexture();"></input>
+        <br/>
+        Wireframe: <input type="checkbox" id="wireframe" ></input>
+        <br/>
+        Wireframe width: <input id="wireframeWidth" type="range" name="points" value="0.01" min="0" max="0.5" step="0.0001"></input>
+        <br/>
+        Light position: <input id="lightPosition" type="input" value="0,0,-2"></input>
+        <br/>
+    </div>
+</body>
+
+</html>
