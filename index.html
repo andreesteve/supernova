@@ -25,7 +25,7 @@
     
     var earthRadius = 6371;
     var moonRadius = 1737.4 / earthRadius;
-    var sunRadius = 1; //(6371 + 6371) / earthRadius;
+    var sunRadius = 5; //696000 / earthRadius;
     var distanceEarthMoon = 4; //384400 / earthRadius;
     var moonInclination = (5.14 / 180) * Math.PI; // inclination in relation to the sun's plane
     var moonObliquity = (6.58 / 180) * Math.PI ; // moon's axial tilt
@@ -47,6 +47,7 @@
     var sunTexture;
     var camera;
     var lightPosition;
+    var focalLength;
     
     var face;
     var earth;
@@ -133,13 +134,17 @@
         glx = new gx();
         glx.initializeWebgl(canvas);
         glxInput = new gx.input(canvas);        
-        camera = new gx.camera([0, 0, -40]);
+        camera = new gx.camera([0, 0, -30]);
         camera.setTarget([0, 0, 0]);
         
-        mat4.perspective(pMatrix, 45, glx.canvas.clientWidth / glx.canvas.clientHeight, 0.1, 100.0);
+        var fieldOfViewRad = Math.PI * 45.0 / 180.0;
+        mat4.perspective(pMatrix, fieldOfViewRad, glx.canvas.clientWidth / glx.canvas.clientHeight, 0.1, 100.0);
+        
+        focalLength = 1.0 / Math.tan(fieldOfViewRad / 2.0);
         
         var gl = glx.gl;
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        gl.depthFunc(gl.GL_LEQUAL);
         gl.enable(gl.DEPTH_TEST);
         gl.enable(gl.BLEND);
     }
@@ -188,14 +193,12 @@
         
         var lightPosition = new Float32Array(sun.position);
                 
+        shaderProgram = shaderPrograms['sun'];
+        drawFace(shaderProgram, face);
+                
         var shaderProgram = shaderPrograms['main'];
         drawModel(shaderProgram, earth, worldTexture, viewProjectionMatrix, lightPosition);
         drawModel(shaderProgram, moon, moonTexture, viewProjectionMatrix, lightPosition);
-                
-        drawModel(shaderProgram, sun, sunTexture, viewProjectionMatrix, lightPosition);
-        
-        shaderProgram = shaderPrograms['sun'];    
-        drawFace(shaderProgram, face);
     }
     
     function transformIntoScreenCoords(position, modelMatrix, viewProjectionMatrix) {
@@ -212,6 +215,7 @@
         shaderProgram.activate();
         
         shaderProgram.uniform2fv("uResolution", new Float32Array(vec2.fromValues(glx.canvas.width, glx.canvas.height)));
+        shaderProgram.uniform("uFocalLength", focalLength, 'f');
         
         var modelViewMatrix = model.getModelMatrix();
         mat4.multiply(modelViewMatrix, camera.getViewMatrix(), modelViewMatrix);
@@ -220,10 +224,7 @@
         shaderProgram.uniform3fv("uSunCenter", new Float32Array(sun.position));        
         shaderProgram.uniform("uRadius", sunRadius, 'f');
         
-        var pos = vec4.fromValues(0., 0., 1., 1.);
-        vec4.transformMat4(pos, pos, modelViewMatrix);
-        
-        shaderProgram.attributeBuffer("aVertexPosition", model.modelData.vertexBuffer);
+        shaderProgram.attributeBuffer("aVertexPosition", model.modelData.vertexBuffer);        
         shaderProgram.drawElements(model.modelData.indexBuffer);
     }
     

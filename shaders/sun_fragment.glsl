@@ -4,6 +4,7 @@ uniform float uRadius;
 uniform vec2 uResolution;
 uniform vec3 uSunCenter;
 uniform mat4 uModelViewTransformation;
+uniform float uFocalLength;
 
 float rayIntersectsSphere(vec3 ray, vec3 dir, vec3 center, float radius)
 {
@@ -33,45 +34,46 @@ void main(void)
 	float sphereRadius = uRadius;
 	
     // transform sphere center from view model matrix
-    vec4 sphereCenter_v4 = uModelViewTransformation * vec4(uSunCenter.xyz, 1.);
-    vec3 sphereCenter = sphereCenter_v4.xyz;
+    vec3 sphereCenter = (uModelViewTransformation * vec4(uSunCenter.xyz, 1.)).xyz;
 	
     // ray origin
-	vec3 rayOrigin = vec3(0., 0., 1.20710678016);
+	vec3 rayOrigin = vec3(0., 0., 0.);
+    	
+    vec3 rayDirection = vec3(uv.xy, -uFocalLength);    
+    rayDirection = normalize(rayDirection);    
     
-	// screen position
-	vec3 screenPosition = vec3(0., 0., 0.);
-	
-	// ray direction - ray will always go towards the sun
-	vec3 rayDirection = normalize(screenPosition - rayOrigin + vec3(uv.xy, 0.));
-	
 	// gets distance to sphere
 	float distanceToSphere = rayIntersectsSphere(rayOrigin, rayDirection, sphereCenter, sphereRadius);
-		
+        
 	// make value 0 if outside sphere	
 	float smallestDistance = distance(rayOrigin, sphereCenter) - sphereRadius;
-	float bigestDistance = pow(pow(smallestDistance + sphereRadius, 2.) + pow(sphereRadius, 2.), 0.5);
+	float bigestDistance = sqrt(pow(smallestDistance + sphereRadius, 2.) + pow(sphereRadius, 2.));
 	
 	float fade = 0.;
 	float fadeYellow = 0.;
 	float fadeOrange = 0.;
 	float fadeWhite = 0.;
     float alpha = 0.;
+    
 	if (distanceToSphere >= 0.) {
 		fade = (distanceToSphere - smallestDistance) / (bigestDistance - smallestDistance);
 		fade = 1. - fade;
 		fadeOrange = pow(fade, 8.);
 		fadeYellow = pow(fade, 16.);
 		fadeWhite = min(pow(fade, 128.), 0.3);
+        
         alpha = 1.;
-	}
-		
+	} else {
+        discard;
+    }
+
 	vec3 yellow = vec3(1., 1., 0.);
 	vec3 orange = vec3(1., 0.517, 0.392);
-	
+
 	gl_FragColor.rgb = 
 		vec3(1., 1., 1.) * fadeWhite 
 		+ orange * fadeOrange
 		+ yellow * fadeYellow;
-	gl_FragColor.a = alpha;
+	gl_FragColor.a = 1.; // * max(length(gl_FragColor.rgb), 0.2);
+    // gl_FragDepth = 1.; // not available in webgl?
 }

@@ -3,7 +3,7 @@ gx = function(gl) {
 };
 
 gx.prototype.initializeWebgl = function(canvas) {
-    this.gl = canvas.getContext("experimental-webgl");
+    this.gl = canvas.getContext("webgl");
     this.canvas = canvas;
 };
 
