@@ -1,14 +1,24 @@
 gx.drawingContext = klass({
-    initialize: function(options) {
-        this._worldMatrixStack = [];
-        
-        this._camera = options.camera;
-        this._projectionMatrix = options.projectionMatrix;
+    initialize: function(options) {        
         this.glx = options.glx;
-        this.glxInput = options.glxInput;
+        this.glxInput = options.glxInput;        
         
         this.currentTime = Date.now();
         this.elapsedTime = 0;
+        
+        
+        // private members
+        this._worldMatrixStack = [];        
+        this._camera = options.camera;
+        this._projectionMatrix = options.projectionMatrix;
+        this._projectionHelper = new gx.projectionHelper({
+            viewportResolution: [this.glx.canvas.clientWidth, this.glx.canvas.clientHeight]
+        });
+    },
+    
+    getProjectionHelper: function() {
+        this._projectionHelper.update(this._camera, this._projectionMatrix);
+        return this._projectionHelper;
     },
     
     getWorldMatrix: function() {

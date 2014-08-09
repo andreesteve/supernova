@@ -10,6 +10,46 @@ supernova.mainLoop = gx.mainLoop.extend({
             },
         });
         
+        this._overlay = new gx.overlay2d({
+            canvas: canvas
+        });
+        
+        this._overlay.text({
+            position: [100, 100],
+            text: 'test',
+            fontColor: 'white'
+        });
+        
+        this._overlay.circle({
+            center: [100, 100],
+            radius: 100,
+            color: 'white'
+        });
+        
+        this._debug = new supernova.debugPrinter({
+            canvas: canvas
+        });
+        
+        // current time
+        this._debug.addDebugCallback(function(context) {
+            return "currentTime: " + context.currentTime;
+        });
+        
+        var formatArray = this._debug.formatArray;
+        
+        // mouse position
+        this._debug.addDebugCallback(function(context) {
+            var pos = context.glxInput.getMousePosition();
+            return "mouse: " + formatArray(pos);
+        });
+
+        // mouse projection
+        this._debug.addDebugCallback(function(context) {
+            var pos = context.glxInput.getMousePosition();
+            var projected = context.getProjectionHelper().unproject(pos);
+            return "mouse 3D: " + formatArray(projected);
+        });
+        
         this._scene = null;
         this._ambientLightColor = vec3.fromValues(0.3, 0.3, 0.3);
     },
@@ -56,6 +96,67 @@ supernova.mainLoop = gx.mainLoop.extend({
         context.lightPosition = new Float32Array([0, 0, 0]);
     
         this._scene.draw(context);
+                
+        if (context.glxInput.isLeftButtonPressed())
+        {
+            var mousePos = context.glxInput.getMousePosition();
+            //this.raytraceObject(resolution, context._camera._position, context.viewProjectionMatrix, this._scene.objects, mousePos);
+        }
+    },    
+    
+    raytraceObject: function(cameraPosition, viewProjectionMatrix, objectList, viewportPosition) {
+        var directionScreenCoords = vec4.fromValues(
+            -1 + 2 * viewportPosition[0] / resolution[0], 
+            1 - 2 * viewportPosition[1] / resolution[1], 
+            2.0 * (viewportPosition[2] || 0) -1.0,
+            1);
+        
+        var inverse = mat4.create();
+        mat4.invert(inverse, viewProjectionMatrix);
+        
+        var directionWorldCoords = vec4.create();
+        vec4.transformMat4(directionWorldCoords, directionScreenCoords, inverse);
+        
+        var w = directionWorldCoords[3];
+        var _directionWorldCoords = vec3.fromValues(directionWorldCoords[0] / w, directionWorldCoords[1] / w, directionWorldCoords[2] / w);
+        
+        for (var i = 0; i < objectList.length; i++) {
+            var obj = objectList[i];
+            
+            var radius = obj._planetRadius;
+            var pos = obj._position;
+            
+            if (this.raySphereIntersection(pos, radius, cameraPosition, _directionWorldCoords)) {
+            
+                this._overlay.circle({
+                    center: viewportPosition,
+                    radius: 10,
+                    color: 'white'
+                });
+            
+                break;
+            }            
+        }
+    },
+    
+    raySphereIntersection: function(sphereCenter, sphereRadius, rayOrigin, rayDirection) {
+        // http://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
+        
+        var rayOriginMinusSphereCenter = vec3.create();
+        vec3.subtract(rayOriginMinusSphereCenter, rayOrigin, sphereCenter);
+        
+        var a = vec3.dot(rayDirection, rayOriginMinusSphereCenter);
+        var rayOriginMinusSphereCenterLengthSquare = vec3.dot(rayOriginMinusSphereCenter, rayOriginMinusSphereCenter);
+        var radiusSquare = sphereRadius * sphereRadius;
+        var aSquare = a * a;
+        
+        var b = aSquare - rayOriginMinusSphereCenterLengthSquare + radiusSquare;
+        
+        if (b < 0) {
+            return false;
+        }
+        
+        return true;
     },
     
     _setupScene: function(context) {
@@ -95,11 +196,13 @@ supernova.mainLoop = gx.mainLoop.extend({
             
         scene.addObject(earth);
         
+        scene.addObject(this._debug);
+        
         this._scene = scene;
         
         var camera = context._camera;
-        camera.setPosition([0, 50, 0]);
-        camera.setTarget([0, 0, 0]);
+        camera.setPosition([0, 0, 0]);
+        camera.setTarget([0, 0, 1]);
     },
     
     _moveCameraInput: function(context) {       
@@ -143,7 +246,7 @@ supernova.mainLoop = gx.mainLoop.extend({
         }
         
         var rotationSpeed = Math.PI * 0.04 * elapsedTime;
-        if (glxInput.isLeftButtonPressed()) {            
+        if (glxInput.isRightButtonPressed()) {            
             var mouseRelDisp = glxInput.getRelativeMouseDisplacement();
             pitch = -mouseRelDisp[1] * rotationSpeed;
             yaw = -mouseRelDisp[0] * rotationSpeed;
