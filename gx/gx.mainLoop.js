@@ -32,7 +32,7 @@ gx.mainLoop = klass({
         var gl = this._glx.gl;
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
-        gl.viewport(0, 0, this._glx.canvas.width, this._glx.canvas.height);
+        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);    
     },
     

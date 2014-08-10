@@ -63,7 +63,7 @@ gx.overlay2d = klass({
         var x = options.x || 0;
         var y = options.y || 0;
         var width = options.width || this._overlay.clientWidth;
-        var height = options.height || this._overlay.clientHeigh;
+        var height = options.height || this._overlay.clientHeight;
         
         this._context.clearRect (x, y, width, height);
     },

@@ -1,18 +1,25 @@
 gx.projectionHelper = klass({
-    initialize: function(options) {
-        this._resolution = options.viewportResolution;        
+    initialize: function(glx) {
+
+        var canvas = glx.gl.canvas;
+
+        this._resolution = [glx.gl.drawingBufferWidth, glx.gl.drawingBufferHeight];
+        
+        this._viewportToDrawingResolutionRatio = [
+            this._resolution[0] / canvas.clientWidth,
+            this._resolution[1] / canvas.clientHeight
+        ]
     },
     
-    update: function(camera, viewProjectionMatrix) {
-        this._camera = camera;
+    update: function(viewProjectionMatrix) {
         this._viewProjectionMatrix = viewProjectionMatrix;
     },
     
-    unproject: function(screenCoords) {
+    unproject: function(point) {
         var directionScreenCoords = vec4.fromValues(
-            -1 + 2 * screenCoords[0] / this._resolution[0], 
-            1 - 2 * screenCoords[1] / this._resolution[1], 
-            2.0 * (screenCoords[2] || 0) -1.0,
+            -1 + 2 * point[0] / this._resolution[0], 
+            1 - 2 * point[1] / this._resolution[1], 
+            2.0 * (point[2] || 0) -1.0,
             1);
         
         var inverse = mat4.create();
@@ -25,5 +32,20 @@ gx.projectionHelper = klass({
         var directionWorldCoords = vec3.fromValues(directionWorldCoords[0] / w, directionWorldCoords[1] / w, directionWorldCoords[2] / w);
         
         return directionWorldCoords;
+    },
+    
+    /**
+    * Unprojects a point in the screen coordinate system into the world coordinate system.
+    * Does the same as {@link unproject} but adjusting the point argument to account for screen resizing.
+    * @param {vec3} point - The point in screen coordinates.    
+    * @returns {vec3} The unprojected point in world coordinates.
+    * @see {@link unproject}
+    */
+    unprojectScreenCoordinates: function(point) {
+        var drawingPoint = vec3.clone(point);
+        drawingPoint[0] *= this._viewportToDrawingResolutionRatio[0];
+        drawingPoint[1] *= this._viewportToDrawingResolutionRatio[1];
+        
+        return this.unproject(drawingPoint);
     },
 });

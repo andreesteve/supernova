@@ -12,9 +12,13 @@ gx.scene = gx.object.extend({
     update: function(context) {
         this.supr(context);
         
+        context.pushWorldMatrix(this._getWorldMatrix());
+        
         for (var i = 0; i < this.objects.length; i++) {
             this.objects[i].update(context);
         }
+        
+        context.popWorldMatrix();
     },
     
     draw: function(context) {
@@ -29,5 +33,15 @@ gx.scene = gx.object.extend({
         }
         
         context.popWorldMatrix();
-    }
+    },
+    
+    accept: function(visitor) {
+        for (var i = 0; i < this.objects.length; i++) {
+            if (this.objects[i].accept(visitor)) {
+                return true;
+            }
+        }
+        
+        return false;
+    },
 });

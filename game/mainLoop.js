@@ -46,7 +46,7 @@ supernova.mainLoop = gx.mainLoop.extend({
         // mouse projection
         this._debug.addDebugCallback(function(context) {
             var pos = context.glxInput.getMousePosition();
-            var projected = context.getProjectionHelper().unproject(pos);
+            var projected = context.getProjectionHelper().unprojectScreenCoordinates(pos);
             return "mouse 3D: " + formatArray(projected);
         });
         
@@ -96,67 +96,33 @@ supernova.mainLoop = gx.mainLoop.extend({
         context.lightPosition = new Float32Array([0, 0, 0]);
     
         this._scene.draw(context);
-                
-        if (context.glxInput.isLeftButtonPressed())
-        {
-            var mousePos = context.glxInput.getMousePosition();
-            //this.raytraceObject(resolution, context._camera._position, context.viewProjectionMatrix, this._scene.objects, mousePos);
-        }
+
+        this._overlay.clear();
+        var mousePos = context.glxInput.getMousePosition();
+        this.raytraceObject(context, context._camera._position, this._scene, mousePos);
     },    
     
-    raytraceObject: function(cameraPosition, viewProjectionMatrix, objectList, viewportPosition) {
-        var directionScreenCoords = vec4.fromValues(
-            -1 + 2 * viewportPosition[0] / resolution[0], 
-            1 - 2 * viewportPosition[1] / resolution[1], 
-            2.0 * (viewportPosition[2] || 0) -1.0,
-            1);
+    raytraceObject: function(context, cameraPosition, scene, viewportPosition) {
+        var helper = context.getProjectionHelper();
+        var worldPosition = helper.unprojectScreenCoordinates(viewportPosition);
+        var rayDirection = vec3.create();
+        vec3.sub(rayDirection, worldPosition, cameraPosition);
+        vec3.normalize(rayDirection, rayDirection);
         
-        var inverse = mat4.create();
-        mat4.invert(inverse, viewProjectionMatrix);
+        var intersector = new gx.rayIntersector({
+            rayOrigin: cameraPosition,
+            rayDirection: rayDirection
+        });
         
-        var directionWorldCoords = vec4.create();
-        vec4.transformMat4(directionWorldCoords, directionScreenCoords, inverse);
+        var intersectedObject = intersector.intersects(scene);
         
-        var w = directionWorldCoords[3];
-        var _directionWorldCoords = vec3.fromValues(directionWorldCoords[0] / w, directionWorldCoords[1] / w, directionWorldCoords[2] / w);
-        
-        for (var i = 0; i < objectList.length; i++) {
-            var obj = objectList[i];
-            
-            var radius = obj._planetRadius;
-            var pos = obj._position;
-            
-            if (this.raySphereIntersection(pos, radius, cameraPosition, _directionWorldCoords)) {
-            
-                this._overlay.circle({
+        if (intersectedObject != null) {
+            this._overlay.circle({
                     center: viewportPosition,
                     radius: 10,
                     color: 'white'
-                });
-            
-                break;
-            }            
+            });
         }
-    },
-    
-    raySphereIntersection: function(sphereCenter, sphereRadius, rayOrigin, rayDirection) {
-        // http://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
-        
-        var rayOriginMinusSphereCenter = vec3.create();
-        vec3.subtract(rayOriginMinusSphereCenter, rayOrigin, sphereCenter);
-        
-        var a = vec3.dot(rayDirection, rayOriginMinusSphereCenter);
-        var rayOriginMinusSphereCenterLengthSquare = vec3.dot(rayOriginMinusSphereCenter, rayOriginMinusSphereCenter);
-        var radiusSquare = sphereRadius * sphereRadius;
-        var aSquare = a * a;
-        
-        var b = aSquare - rayOriginMinusSphereCenterLengthSquare + radiusSquare;
-        
-        if (b < 0) {
-            return false;
-        }
-        
-        return true;
     },
     
     _setupScene: function(context) {
@@ -164,7 +130,7 @@ supernova.mainLoop = gx.mainLoop.extend({
                    
         var moon = new supernova.planet({
             context: context,
-            planetRadius: 0.5,
+            planetRadius: 0.3,
             rotationPeriod: 1000,
             orbitPeriod: 1000,
             orbitInclination: 20 * Math.Degree,
@@ -174,7 +140,7 @@ supernova.mainLoop = gx.mainLoop.extend({
         
         var earth = new supernova.planet({
             context: context,
-            planetRadius: 1,
+            planetRadius: 0.8,
             rotationPeriod: 1000,
             orbitPeriod: 2000,
             orbitInclination: 0,
@@ -183,7 +149,12 @@ supernova.mainLoop = gx.mainLoop.extend({
             satelites: [ moon ]
         });
         
-        var earth = new supernova.planet({
+        var me = this;
+        this._debug.addDebugCallback(function(context) {
+            return "earth: " + me._debug.formatArray(earth._worldPosition);
+        });
+        
+        var sun = new supernova.planet({
             context: context,
             planetRadius: 1,
             rotationPeriod: 1000,
@@ -193,15 +164,15 @@ supernova.mainLoop = gx.mainLoop.extend({
             textureName: 'sun',
             satelites: [ earth ]
         });
-            
-        scene.addObject(earth);
+        
+        scene.addObject(sun);
         
         scene.addObject(this._debug);
         
         this._scene = scene;
         
         var camera = context._camera;
-        camera.setPosition([0, 0, 0]);
+        camera.setPosition([0, 0, -20]);
         camera.setTarget([0, 0, 1]);
     },
     

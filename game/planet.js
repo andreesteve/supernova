@@ -19,6 +19,8 @@ supernova.planet = gx.object.extend({
         this._texture = planetInfo.context.textureManager.getTexture(planetInfo.textureName);
         
         this._satelites = planetInfo.satelites || [];
+        
+        this._worldPosition = vec3.create();
     },
     
     update: function(context) {
@@ -27,9 +29,16 @@ supernova.planet = gx.object.extend({
         this._position = this._calculateOrbitPosition(context.currentTime);        
         this._model.rotation[1] = (context.currentTime / this._rotationPeriod) % Math.PI2;
         
+        // update world position
+        vec3.transformMat4(this._worldPosition, this._position, context.getWorldMatrix());
+
+        context.pushWorldMatrix(this._getWorldMatrix());
+        
         for (var i = 0; i < this._satelites.length; i++) {
             this._satelites[i].update(context);
         }
+        
+        context.popWorldMatrix();
     },
     
     draw: function(context) {
@@ -37,7 +46,7 @@ supernova.planet = gx.object.extend({
         
         var worldMatrix = context.getWorldMatrix();
         var modelMatrix = this._model.getModelMatrix();        
-        
+               
         this._drawSatelites(context);
 
         mat4.translate(modelMatrix, modelMatrix, this._position);
@@ -66,6 +75,23 @@ supernova.planet = gx.object.extend({
         shader.drawElements(this._model.modelData.indexBuffer);
     },
     
+    accept: function(visitor) {
+        var result = this.supr(visitor);
+        
+        if (result) {
+            return result;
+        }
+        
+        for (var i = 0; i < this._satelites.length; i++) {
+            result = this._satelites[i].accept(visitor);
+            if (result) {
+                return result;
+            }
+        }
+        
+        return null;
+    },
+    
     _drawSatelites: function(context) {
         var objectWorldMatrix = this._getWorldMatrix();
         
@@ -75,7 +101,7 @@ supernova.planet = gx.object.extend({
             this._satelites[i].draw(context);
         }
         
-        context.popWorldMatrix(objectWorldMatrix);
+        context.popWorldMatrix();
     },
     
     _calculateOrbitPosition:  function(currentTime) {

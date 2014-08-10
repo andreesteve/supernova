@@ -11,13 +11,11 @@ gx.drawingContext = klass({
         this._worldMatrixStack = [];        
         this._camera = options.camera;
         this._projectionMatrix = options.projectionMatrix;
-        this._projectionHelper = new gx.projectionHelper({
-            viewportResolution: [this.glx.canvas.clientWidth, this.glx.canvas.clientHeight]
-        });
+        this._projectionHelper = new gx.projectionHelper(this.glx);
     },
     
     getProjectionHelper: function() {
-        this._projectionHelper.update(this._camera, this._projectionMatrix);
+        this._projectionHelper.update(this.viewProjectionMatrix);
         return this._projectionHelper;
     },
     
