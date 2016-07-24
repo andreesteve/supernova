@@ -11,7 +11,10 @@ gx.rayIntersector = klass({
     },
     
     visit: function(obj) {
-        // TODO: using game specific values, fix this
+        // avoid null exception - this needs to be removed
+        if (!obj._worldPosition) return false;
+        
+        // TODO: using game specific values, fix this        
         var intersects = this._raySphereIntersection(
             obj._worldPosition, 
             obj._planetRadius, 
