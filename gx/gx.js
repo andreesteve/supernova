@@ -1,3 +1,6 @@
+Math.PI2 = 2 * Math.PI;
+Math.Degree = Math.PI / 180;
+
 gx = function(gl) {
     this.gl = gl;
 };

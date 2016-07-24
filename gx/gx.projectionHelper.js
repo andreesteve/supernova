@@ -42,6 +42,10 @@ gx.projectionHelper = klass({
     * @see {@link unproject}
     */
     unprojectScreenCoordinates: function(point) {
+        // there is an issue when the canvas width/height does not match
+        // the actual canvas display on the screen, i.e. when the canvas
+        // get resized. This skew the projection and I'm yet to find a solution for it.
+
         var drawingPoint = vec3.clone(point);
         drawingPoint[0] *= this._viewportToDrawingResolutionRatio[0];
         drawingPoint[1] *= this._viewportToDrawingResolutionRatio[1];

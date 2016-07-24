@@ -37,54 +37,14 @@
 <script id ="sun_vert" type="x-shader/x-vertex" src="shaders\sun_vertex.glsl"></script>
 
 <script type="text/javascript">
-
-    Math.PI2 = 2 * Math.PI;
-    Math.Degree = Math.PI / 180;
-    /*
-    var earthRadius = 6371;
-    var moonRadius = 1737.4 / earthRadius;
-    var sunRadius = 5; //696000 / earthRadius;
-    var distanceEarthMoon = 4; //384400 / earthRadius;
-    var moonInclination = (5.14 / 180) * Math.PI; // inclination in relation to the sun's plane
-    var moonObliquity = (6.58 / 180) * Math.PI ; // moon's axial tilt
-
-    var earthRotationPeriod = 0.99726968;
-    var moonTranslationPeriod = 27.321582 / earthRotationPeriod;
-    var moonRotationPeriod = 27.321582 / earthRotationPeriod;
-    var earthSunDistance = 10;// 150 * Math.pow(10, 6) / earthRadius;
-    var earthTranslationPeriod = 365.25 / earthRotationPeriod; // days
-    
-    function raytraceObject(cameraPosition, viewProjectionMatrix, objectList, viewportPosition) {
-        var directionScreenCoords = vec3.fromValues(viewportPosition[0], viewportPosition[1], 0);
-        var inverse = mat4.create();
-        mat4.invert(inverse, viewProjectionMatrix);
-        
-        var directionWorldCoords = vec3.create();
-        vec3.transfromMat4(directionWorldCoords, directionScreenCoords, inverse);
-        
-        for (var i = 0; i < objectList.lenght; i++) {
-            var obj = objectList[i];
-            
-            obj.intersects(cameraPosition, directionWorldCoords);
-        }
-    }
-    
-    function transformIntoScreenCoords(position, modelMatrix, viewProjectionMatrix) {
-        var transformedPosition = vec3.create();
-        vec3.transformMat4(transformedPosition, position, modelMatrix);
-        vec3.transformMat4(transformedPosition, transformedPosition, viewProjectionMatrix);
-        vec3.scale(transformedPosition, transformedPosition, 1 / transformedPosition[2]); // make values in range 0..1
-        transformedPosition[0] = (glx.canvas.width / 2) * (transformedPosition[0] + 1);
-        transformedPosition[1] = (glx.canvas.height / 2) * (transformedPosition[1] + 1);
-        return transformedPosition;
-    }
-    */
-    
-    function webGLStart() {  
-        var canvas = document.getElementById("canvas");        
-        var mainLoop = new supernova.mainLoop(canvas);
-        mainLoop.start();
-    }
+  function webGLStart() {  
+  var canvas = document.getElementById("canvas");
+  canvas.height = $('body').height();
+  canvas.width = $('body').width();
+  var mainLoop = new supernova.mainLoop(canvas);
+  window.mainLoop = mainLoop;                    
+  mainLoop.start();
+  }
 </script>
 
 
@@ -93,7 +53,7 @@
 
     <body onload="webGLStart();">
         <div>
-            <canvas id="canvas" style="border: none;width: 98%;height: 98%;" width="1024" height="1024"></canvas>
+            <canvas id="canvas" style="border: none; margin: 0px"></canvas>
         </div>
     </body>
 

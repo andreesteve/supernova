@@ -40,6 +40,10 @@ gx.camera.prototype.setPosition = function(position) {
     this._updateTarget();
 };
 
+gx.camera.prototype.getPosition = function() {
+    return vec3.clone(this._position);
+};
+
 gx.camera.prototype.setTarget = function(target) {
 
     this._target = target;
