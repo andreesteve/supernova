@@ -1,4 +1,4 @@
-supernova.textureManager = klass({
+gx.textureManager = klass({
     initialize: function(glx, basePath) {    
         this._glx = glx;
         this._basePath = basePath || "";

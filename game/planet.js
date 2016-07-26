@@ -21,6 +21,8 @@ supernova.planet = gx.object.extend({
         this._satelites = planetInfo.satelites || [];
         
         this._worldPosition = vec3.create();
+
+        this._shader = new gx.phongShader();
     },
     
     update: function(context) {
@@ -71,28 +73,10 @@ supernova.planet = gx.object.extend({
         
         mat4.translate(modelMatrix, modelMatrix, this._position);
         mat4.multiply(modelMatrix, worldMatrix, modelMatrix);
-        
-        var normalMatrix = mat3.create();
-        mat3.normalFromMat4(normalMatrix, modelMatrix);        
-        
-        var shader = context.shaderManager.getShader('main');
-        shader.activate();
-    
-        shader.uniformMatrix("uModelMatrix", modelMatrix);
-        shader.uniformMatrix("uViewProjectionMatrix", context.viewProjectionMatrix);        
-        shader.uniformMatrix("uNormalMatrix", normalMatrix);
 
-        this._texture.attach(0);
-        shader.uniform("uSampler2D", 0, 'i');
-           
-        shader.uniform3fv('uAmbientLightColor', context.ambientLightColor);
-        shader.uniform3fv('uLightPosition', context.lightPosition);
-        
-        shader.attributeBuffer("aVertexPosition", this._model.modelData.vertexBuffer);
-        shader.attributeBuffer("aTexCoord", this._model.modelData.texCoordBuffer);
-        shader.attributeBuffer("aNormal", this._model.modelData.normalBuffer);
-
-        shader.drawElements(this._model.modelData.indexBuffer);
+        this._shader.worldMatrix = modelMatrix;
+        this._shader.texture = this._texture;
+        this._shader.draw(context, this._model);
     },
     
     _drawSatelites: function(context) {

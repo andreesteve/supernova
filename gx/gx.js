@@ -22,7 +22,7 @@ gx.prototype.loadShaders = function(onLoadComplete) {
     var me = this;
     
     function createShader(shaderString, shaderType, shaderId) {
-        var gxShader = new gx.shader(shaderId, shaderString, shaderType);
+        var gxShader = new gx.shaderUnit(shaderId, shaderString, shaderType);
         
         gxShader.compile(me.gl);
                
@@ -107,22 +107,6 @@ gx.prototype.loadShaders = function(onLoadComplete) {
 gx.prototype.createShaderProgram = function(vertexShader, fragmentShader) {
     var shaderProgram = new gx.shaderProgram(this.gl, vertexShader, fragmentShader);
     return shaderProgram;
-
-    /*
-    shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
-    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-
-    shaderProgram.baricentricPositionAttribute = gl.getAttribLocation(shaderProgram, "aBaricentricPosition");
-    gl.enableVertexAttribArray(shaderProgram.baricentricPositionAttribute);
-
-    shaderProgram.aTexCoord = gl.getAttribLocation(shaderProgram, "aTexCoord");
-    gl.enableVertexAttribArray(shaderProgram.aTexCoord);
-
-    shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
-    shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
-    shaderProgram.uSampler2D = gl.getUniformLocation(shaderProgram, "uSampler2D");
-    shaderProgram.uWireframe = gl.getUniformLocation(shaderProgram, "uWireframe");	
-    shaderProgram.uWireframeWidth = gl.getUniformLocation(shaderProgram, "uWireframeWidth");*/
 };
 
 gx.prototype.createBuffer = function(itemSize, elementArray, bufferType) {   

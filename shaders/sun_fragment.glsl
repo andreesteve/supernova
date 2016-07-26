@@ -1,5 +1,3 @@
-#extension GL_EXT_frag_depth : enable
-
 precision mediump float;
 
 uniform float uRadius;
@@ -77,5 +75,4 @@ void main(void)
 		+ orange * fadeOrange
 		+ yellow * fadeYellow;
 	gl_FragColor.a = alpha; // * max(length(gl_FragColor.rgb), 0.2);
-    gl_FragDepthEXT = 0.5; // not available in webgl?
 }

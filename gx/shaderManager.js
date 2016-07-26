@@ -1,4 +1,4 @@
-supernova.shaderManager = klass({
+gx.shaderManager = klass({
     initialize: function(glx) {    
         this._glx = glx;
         this._preparedShaders = {};

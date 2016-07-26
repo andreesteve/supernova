@@ -1,21 +1,41 @@
 gx.mainLoop = klass({
+    /**
+     * Initializes the main loop class.
+     * @constructor
+     * @param options argument to initialize this class.
+     * @param options.canvas the canvas to be used for rendering.
+     * @param options.projection projection configuration values.
+     * @param options.shaderDefinition definition object for shaders to be loaded.
+     * @param options.textureDefinition definition object for textures to be loaded.
+     */
     initialize: function(options) {
     
         var canvas = options.canvas;
+
+        this._shaderDefinition = options.shaderDefinition || [];
+
+        // out of box shaders
+        this._shaderDefinition.push({
+            shaderName: 'main',
+            vertexShaderName: 'main_vert',
+            fragmentShaderName: 'main_frag'
+        });
+        
+        this._textueDefinition = options.textureDefinition || [];
         this._canvas = canvas;
         
         this._glx = new gx();
         this._glx.initializeWebgl(canvas);
-        this._glxInput = new gx.input(canvas);    
-
+        this._glxInput = new gx.input(canvas);
+        
         this._context = new gx.drawingContext({
             camera: new gx.camera(),
             projectionMatrix: this._createProjection(canvas, options.projection),
             glx: this._glx,
-            glxInput: this._glxInput
+            glxInput: this._glxInput,
+            shaderManager: new gx.shaderManager(this._glx),
+            textureManager: new gx.textureManager(this._glx, 'assets/textures/')
         });
-     
-        // focalLength = 1.0 / Math.tan(fieldOfViewRad / 2.0);
     },
     
     start: function() {
@@ -43,8 +63,14 @@ gx.mainLoop = klass({
         gl.depthFunc(gl.GL_LEQUAL);
         gl.enable(gl.DEPTH_TEST);
         gl.enable(gl.BLEND);
-        
-        this.setup(this._context, this._onSetupCompletedInternal.bind(this));
+
+        // load shaders and textures
+        this._context.shaderManager.loadShaders(this._shaderDefinition, function() {            
+            this._context.textureManager.loadTextures(this._textueDefinition, function() {
+                // then call child class setup
+                this.setup(this._context, this._onSetupCompletedInternal.bind(this));
+            }.bind(this));
+        }.bind(this));
     },
     
     _onSetupCompletedInternal: function() {        

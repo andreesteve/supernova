@@ -4,14 +4,16 @@ gx.drawingContext = klass({
         this.glxInput = options.glxInput;        
         
         this.currentTime = Date.now();
-        this.elapsedTime = 0;
-        
+        this.elapsedTime = 0;        
         
         // private members
         this._worldMatrixStack = [];        
         this._camera = options.camera;
         this._projectionMatrix = options.projectionMatrix;
         this._projectionHelper = new gx.projectionHelper(this.glx);
+
+        this.shaderManager = options.shaderManager;
+        this.textureManager = options.textureManager;
     },
     
     getProjectionHelper: function() {

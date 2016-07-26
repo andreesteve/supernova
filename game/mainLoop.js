@@ -1,6 +1,16 @@
 supernova.mainLoop = gx.mainLoop.extend({
     
     initialize: function(canvas) {
+        var shaderDefinition = [
+            { shaderName: 'sun', vertexShaderName: 'main_vert', fragmentShaderName: 'sun2_frag' }
+        ];
+        
+        var textureDefinition = [
+            { textureName: 'earth', texturePath: 'earth_flat_map.jpg' },
+            { textureName: 'moon', texturePath: 'moon.bmp' },
+            { textureName: 'sun', texturePath: 'sun.jpg' },
+        ];
+
         this.supr({
             canvas: canvas,
             projection: {
@@ -8,6 +18,8 @@ supernova.mainLoop = gx.mainLoop.extend({
                 nearPlane: 0.1,
                 farPlane: 100
             },
+            shaderDefinition: shaderDefinition,
+            textureDefinition: textureDefinition
         });
         
         this._overlay = new gx.overlay2d({
@@ -55,34 +67,8 @@ supernova.mainLoop = gx.mainLoop.extend({
     },
     
     setup: function(context, onSetupComplete) {
-        var glx = context.glx;
-
-        glx.gl.getExtension("EXT_frag_depth");
-        
-        var shaderDefinition = [
-            { shaderName: 'main', vertexShaderName: 'main_vert', fragmentShaderName: 'main_frag' },
-            { shaderName: 'sun', vertexShaderName: 'main_vert', fragmentShaderName: 'sun2_frag' }
-        ];
-        
-        var textureDefinition = [
-            { textureName: 'earth', texturePath: 'earth_flat_map.jpg' },
-            { textureName: 'moon', texturePath: 'moon.bmp' },
-            { textureName: 'sun', texturePath: 'sun.jpg' },
-        ];
-    
-        var shaderManager = new supernova.shaderManager(glx);
-        var textureManager = new supernova.textureManager(glx, 'assets/textures/');
-    
-        context.shaderManager = shaderManager;
-        context.textureManager = textureManager;
-    
-        shaderManager.loadShaders(shaderDefinition, function() {            
-            textureManager.loadTextures(textureDefinition, function() {
-            
-                this._setupScene(context);
-                onSetupComplete();
-            }.bind(this));
-        }.bind(this));
+        this._setupScene(context);
+        onSetupComplete();
     },
     
     update: function(context) {    
