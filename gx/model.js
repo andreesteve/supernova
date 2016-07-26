@@ -109,3 +109,45 @@ gx.models.face = function (glx, left, right) {
     
     return new gx.model(glx, m);
 };
+
+gx.models.disk = function (glx, outer, inner, slices) {
+    var m = new gx.modelData(glx);
+
+    // angle for each slice
+    var t = Math.PI * 2 / slices;
+    
+    // a is the point on the inner circle, b is the one on the outer
+    var ay = 0;
+    var ax = inner;
+    var by = 0;
+    var bx = outer;
+
+    m.vertices.push(ax, ay, 0);
+    m.vertices.push(bx, by, 0);
+    
+    for (var i = 1; i < slices; i++) {
+        var nt = i * t;
+        var sin = Math.sin(nt);
+        var cos = Math.cos(nt);
+        var ay = inner * sin;
+        var ax = inner * cos;
+        var by = outer * sin;
+        var bx = outer * cos;
+
+        // push new vertices calculated
+        m.vertices.push(ax, ay, 0);
+        m.vertices.push(bx, by, 0);
+
+        // index quad
+        var index = i * 2;
+        m.indexes.push(index + 0, index + 2, index + 1);
+        m.indexes.push(index + 2, index + 3, index +1);        
+    }
+    
+    // index last quad
+    var index = slices * 2;
+    m.indexes.push(index + 0, 0, index + 1);
+    m.indexes.push(0,         1, index +1);
+
+    return new gx.model(glx, m);    
+};

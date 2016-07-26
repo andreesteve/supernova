@@ -1,3 +1,5 @@
+#extension GL_EXT_frag_depth : enable
+
 precision mediump float;
 
 uniform float uRadius;
@@ -54,15 +56,15 @@ void main(void)
 	float fadeOrange = 0.;
 	float fadeWhite = 0.;
     float alpha = 0.;
-    
-	if (distanceToSphere >= 0.) {
+
+	if (distanceToSphere >= 0.9) {
 		fade = (distanceToSphere - smallestDistance) / (bigestDistance - smallestDistance);
 		fade = 1. - fade;
 		fadeOrange = pow(fade, 8.);
 		fadeYellow = pow(fade, 16.);
 		fadeWhite = min(pow(fade, 128.), 0.3);
         
-        alpha = 1.;
+        alpha = fade;
 	} else {
         discard;
     }
@@ -74,6 +76,6 @@ void main(void)
 		vec3(1., 1., 1.) * fadeWhite 
 		+ orange * fadeOrange
 		+ yellow * fadeYellow;
-	gl_FragColor.a = 1.; // * max(length(gl_FragColor.rgb), 0.2);
-    // gl_FragDepth = 1.; // not available in webgl?
+	gl_FragColor.a = alpha; // * max(length(gl_FragColor.rgb), 0.2);
+    gl_FragDepthEXT = 0.5; // not available in webgl?
 }

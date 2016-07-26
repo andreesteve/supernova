@@ -24,7 +24,7 @@ supernova.planet = gx.object.extend({
     },
     
     update: function(context) {
-        this.supr();
+        this.supr(context);
         
         this._position = this._calculateOrbitPosition(context.currentTime);        
         this._model.rotation[1] = (context.currentTime / this._rotationPeriod) % Math.PI2;
@@ -42,13 +42,33 @@ supernova.planet = gx.object.extend({
     },
     
     draw: function(context) {
-        this.supr();
-        
-        var worldMatrix = context.getWorldMatrix();
-        var modelMatrix = this._model.getModelMatrix();        
-               
+        this.supr(context);                      
         this._drawSatelites(context);
+        this._drawInternal(context);
+    },
+    
+    accept: function(visitor) {
+        var result = this.supr(visitor);
+        
+        if (result) {
+            return result;
+        }
+        
+        for (var i = 0; i < this._satelites.length; i++) {
+            result = this._satelites[i].accept(visitor);
+            if (result) {
+                return result;
+            }
+        }
+        
+        return null;
+    },
 
+
+    _drawInternal: function(context) {
+        var worldMatrix = context.getWorldMatrix();
+        var modelMatrix = this._model.getModelMatrix();
+        
         mat4.translate(modelMatrix, modelMatrix, this._position);
         mat4.multiply(modelMatrix, worldMatrix, modelMatrix);
         
@@ -73,23 +93,6 @@ supernova.planet = gx.object.extend({
         shader.attributeBuffer("aNormal", this._model.modelData.normalBuffer);
 
         shader.drawElements(this._model.modelData.indexBuffer);
-    },
-    
-    accept: function(visitor) {
-        var result = this.supr(visitor);
-        
-        if (result) {
-            return result;
-        }
-        
-        for (var i = 0; i < this._satelites.length; i++) {
-            result = this._satelites[i].accept(visitor);
-            if (result) {
-                return result;
-            }
-        }
-        
-        return null;
     },
     
     _drawSatelites: function(context) {

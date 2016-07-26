@@ -22,7 +22,7 @@ gx.prototype.loadShaders = function(onLoadComplete) {
     var me = this;
     
     function createShader(shaderString, shaderType, shaderId) {
-        var gxShader = new gx.shader(shaderString, shaderType);
+        var gxShader = new gx.shader(shaderId, shaderString, shaderType);
         
         gxShader.compile(me.gl);
                

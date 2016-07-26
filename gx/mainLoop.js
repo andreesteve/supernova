@@ -40,6 +40,7 @@ gx.mainLoop = klass({
         var gl = this._glx.gl;
         
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        gl.depthFunc(gl.GL_LEQUAL);
         gl.enable(gl.DEPTH_TEST);
         gl.enable(gl.BLEND);
         

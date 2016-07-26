@@ -56,10 +56,12 @@ supernova.mainLoop = gx.mainLoop.extend({
     
     setup: function(context, onSetupComplete) {
         var glx = context.glx;
-    
+
+        glx.gl.getExtension("EXT_frag_depth");
+        
         var shaderDefinition = [
             { shaderName: 'main', vertexShaderName: 'main_vert', fragmentShaderName: 'main_frag' },
-            { shaderName: 'sun', vertexShaderName: 'sun_vert', fragmentShaderName: 'sun_frag' }
+            { shaderName: 'sun', vertexShaderName: 'main_vert', fragmentShaderName: 'sun2_frag' }
         ];
         
         var textureDefinition = [
@@ -154,7 +156,7 @@ supernova.mainLoop = gx.mainLoop.extend({
             return "earth: " + me._debug.formatArray(earth._worldPosition);
         });
         
-        var sun = new supernova.planet({
+        var sun = new supernova.sun({
             context: context,
             planetRadius: 1,
             rotationPeriod: 1000,

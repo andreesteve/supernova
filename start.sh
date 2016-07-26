@@ -1,1 +1,1 @@
-chromium --disable-web-security --user-data-dir index.html
+chromium --disable-web-security --user-data-dir=/tmp/sp index.html

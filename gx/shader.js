@@ -1,7 +1,8 @@
 /**
 *   type = gl.FRAGMENT_SHADER | gl.VERTEX_SHADER
 */
-gx.shader = function(shaderString, type) {
+gx.shader = function(shaderId, shaderString, type) {
+    this.id = shaderId;
     this.glShader = null;
     this.shaderString = shaderString;
     this.shaderType = type;
@@ -15,7 +16,7 @@ gx.shader.prototype.compile = function(gl) {
     gl.compileShader(this.glShader);
     
     if (!gl.getShaderParameter(this.glShader, gl.COMPILE_STATUS)) {
-        throw 'Shader compilation error: ' + gl.getShaderInfoLog(this.glShader);
+        throw 'Shader compilation error for shader "' + this.id + '": ' + gl.getShaderInfoLog(this.glShader);
     }
 };
 

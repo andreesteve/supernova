@@ -23,7 +23,18 @@ supernova.shaderManager = klass({
     },
      
     _prepareShader: function(shaders, programName, vertShaderName, fragShaderName) {
-        var program = this._glx.createShaderProgram(shaders[vertShaderName], shaders[fragShaderName]);;        
+        var vertexShader = shaders[vertShaderName];
+        var fragShader = shaders[fragShaderName];
+
+        if (!vertexShader) {
+            throw "No vertex shader found with name: " + vertShaderName;
+        }
+        
+        if (!fragShader) {
+            throw "No vertex shader found with name: " + fragShaderName;
+        }        
+        
+        var program = this._glx.createShaderProgram(vertexShader, fragShader);
         program.linkProgram();
         
         this._preparedShaders[programName] = program;
