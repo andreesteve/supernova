@@ -12,7 +12,7 @@ gx.scene = gx.object.extend({
     update: function(context) {
         this.supr(context);
         
-        context.pushWorldMatrix(this._getWorldMatrix());
+        context.pushWorldMatrix(this.getWorldMatrix());
         
         for (var i = 0; i < this.objects.length; i++) {
             this.objects[i].update(context);
@@ -24,7 +24,7 @@ gx.scene = gx.object.extend({
     draw: function(context) {
         this.supr(context);
         
-        var worldMatrix = this._getWorldMatrix();
+        var worldMatrix = this.getWorldMatrix();
         
         context.pushWorldMatrix(worldMatrix);
         

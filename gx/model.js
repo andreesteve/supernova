@@ -17,27 +17,28 @@ gx.modelData.prototype.createBuffers = function(glx) {
 gx.model = function(glx, modelData) {
     this.glx = glx;
     this.modelData = modelData;
-    
-    this.position = vec3.create();    
-    this.rotation = vec3.create();
-};
-
-gx.model.prototype.getModelMatrix = function() {
-    var modelMatrix = mat4.create();
-    
-    mat4.identity(modelMatrix);
-    mat4.rotateX(modelMatrix, modelMatrix, this.rotation[0]);
-    mat4.rotateY(modelMatrix, modelMatrix, this.rotation[1]);
-    mat4.rotateZ(modelMatrix, modelMatrix, this.rotation[2]);
-    mat4.translate(modelMatrix, modelMatrix, this.position);
-    
-    return modelMatrix;
 };
 
 gx.models = {};
 
 // shpere
-gx.models.sphere = function (glx, radius, latitudeSize, longitudeSize) {    
+gx.models.sphere = function (glx, radius, latitudeSize, longitudeSize) {
+    if (!glx) {
+        throw 'glx must be provided';
+    }
+
+    if (isNaN(radius) || radius <= 0) {
+        throw 'radius must be greater than 0';
+    }
+
+    if (isNaN(latitudeSize) || latitudeSize <= 0) {
+        throw 'latituteSize must be greater than 0';
+    }
+
+    if (isNaN(longitudeSize) || longitudeSize <= 0) {
+        throw 'latituteSize must be greater than 0';
+    }
+
     var m = new gx.modelData(glx);
     
     var TwoPi = 2 * Math.PI;

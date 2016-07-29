@@ -139,7 +139,7 @@ supernova.mainLoop = gx.mainLoop.extend({
         
         var me = this;
         this._debug.addDebugCallback(function(context) {
-            return "earth: " + me._debug.formatArray(earth._worldPosition);
+            return "earth: " + me._debug.formatArray(earth.getPosition());
         });
         
         var sun = new supernova.sun({

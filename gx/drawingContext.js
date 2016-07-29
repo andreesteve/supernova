@@ -21,19 +21,22 @@ gx.drawingContext = klass({
         return this._projectionHelper;
     },
     
-    getWorldMatrix: function() {
-        // TODO: improve this
-        var worldMatrix = mat4.create();
+    getWorldMatrix: function(worldMatrix) {
+        var m = mat4.create();
         
         this._worldMatrixStack.length > 0
-            ? mat4.copy(worldMatrix, this._worldMatrixStack[0])
-            : mat4.identity(worldMatrix);
-        
+            ? mat4.copy(m, this._worldMatrixStack[0])
+            : mat4.identity(m);
+
         for (var i = 1; i < this._worldMatrixStack.length; i++) {
-            mat4.multiply(worldMatrix, worldMatrix, this._worldMatrixStack[i]);
+            mat4.multiply(m, m, this._worldMatrixStack[i]);
+        }
+
+        if (worldMatrix) {
+            mat4.multiply(m, m, worldMatrix);
         }
         
-        return worldMatrix;
+        return m;
     },
     
     pushWorldMatrix: function(worldMatrix) {
