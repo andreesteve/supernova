@@ -100,7 +100,7 @@ gx.camera.prototype.rotate = function(pitch, yaw, roll) {
     }
     
     if (roll) {
-        mat4.rotate(rot, rot, yaw, this._forward);
+        mat4.rotate(rot, rot, roll, this._forward);
     }
     
     vec3.transformMat4(this._forward, this._forward, rot);
