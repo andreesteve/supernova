@@ -59,10 +59,10 @@ gx.mainLoop = klass({
     _setupInternal: function() {
         var gl = this._glx.gl;
         
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-        gl.depthFunc(gl.GL_LEQUAL);
         gl.enable(gl.DEPTH_TEST);
         gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        gl.depthFunc(gl.GL_LEQUAL);
 
         // load shaders and textures
         this._context.shaderManager.loadShaders(this._shaderDefinition, function() {            

@@ -137,6 +137,16 @@ supernova.mainLoop = gx.mainLoop.extend({
             satelites: [ moon ]
         });
         
+        var jupiter = new supernova.planet({
+            context: context,
+            planetRadius: 2,
+            rotationPeriod: 1000,
+            orbitPeriod: 5000,
+            orbitInclination: 0,
+            orbitDistance: 30,
+            textureName: 'earth'
+        });
+        
         var me = this;
         this._debug.addDebugCallback(function(context) {
             return "earth: " + me._debug.formatArray(earth.getPosition());
@@ -150,7 +160,7 @@ supernova.mainLoop = gx.mainLoop.extend({
             orbitInclination: 0,
             orbitDistance: 0,
             textureName: 'sun',
-            satelites: [ earth ]
+            satelites: [ earth, jupiter ]
         });
         
         scene.addObject(sun);
@@ -160,7 +170,7 @@ supernova.mainLoop = gx.mainLoop.extend({
         this._scene = scene;
         
         var camera = context._camera;
-        camera.setPosition([0, 0, -20]);
+        camera.setPosition([0, 80, -40]);
         camera.setTarget([0, 0, 1]);
     },
     
@@ -170,23 +180,37 @@ supernova.mainLoop = gx.mainLoop.extend({
         var camera = context._camera;
         var pitch = 0;
         var yaw = 0;
+        var roll = 0;
         var glxInput = context.glxInput;
         
         var ambientLightColor = this._ambientLightColor;
+        var speed = 2;
         
         if (glxInput.isKeyPressed('W')) {
-            cameraDisplacement[2] = 1;
+            cameraDisplacement[2] = 1 * speed;
         } else if (glxInput.isKeyPressed('S')) {
-            cameraDisplacement[2] = -1;
-        } else if (glxInput.isKeyPressed('A')) {
-            cameraDisplacement[0] = -1;
+            cameraDisplacement[2] = -1  * speed;
+        }
+
+        if (glxInput.isKeyPressed('A')) {
+            cameraDisplacement[0] = -1  * speed;
         } else if (glxInput.isKeyPressed('D')) {
-            cameraDisplacement[0] = 1;
-        } else if  (glxInput.isKeyPressed(37)) { // left arrow
+            cameraDisplacement[0] = 1 * speed;
+        }
+
+        if (glxInput.isKeyPressed('Q')) {
+            roll = Math.PI * 0.01;
+        } else if (glxInput.isKeyPressed('E')) {
+            roll = - Math.PI * 0.01;
+        } 
+        
+        if  (glxInput.isKeyPressed(37)) { // left arrow
             yaw = Math.PI * 0.01;
         } else if (glxInput.isKeyPressed(38)) { // up arrow
             pitch = Math.PI * 0.01;
-        } else if (glxInput.isKeyPressed(39)) { // right arrow
+        }
+
+        if (glxInput.isKeyPressed(39)) { // right arrow
             yaw = -Math.PI * 0.01;
         } else if (glxInput.isKeyPressed(40)) { // down arrow
             pitch = -Math.PI * 0.01;
@@ -213,7 +237,8 @@ supernova.mainLoop = gx.mainLoop.extend({
         
         var deltaPitch = pitch * rotationSpeed;
         var deltaYaw = yaw * rotationSpeed;
-        camera.rotate(deltaPitch, deltaYaw);
+        var deltaRoll = roll * rotationSpeed;
+        camera.rotate(deltaPitch, deltaYaw, deltaRoll);
         
         var cameraSpeed = 0.01;
         vec3.scale(cameraDisplacement, cameraDisplacement, elapsedTime * cameraSpeed);
