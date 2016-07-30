@@ -1,6 +1,7 @@
 var defaultLatEdgeSize = 50;
 var defaultLongEdgeSize = 30;
-    
+var defaultOrbitModelWidth = 0.1;
+
 supernova.planet = gx.scene.extend({
 
     initialize: function(planetInfo) {
@@ -15,7 +16,7 @@ supernova.planet = gx.scene.extend({
         this._orbitPeriod = planetInfo.orbitPeriod; // milliseconds
         
         this._rotationPeriod = planetInfo.rotationPeriod; // milliseconds
-        this._planetRadius = planetInfo.planetRadius || 1;        
+        this._planetRadius = planetInfo.planetRadius || 1;
         
         var model = new gx.models.sphere(
             context.glx,
@@ -28,12 +29,25 @@ supernova.planet = gx.scene.extend({
             model: model,
             texture: texture
         });
-
+               
         this.addObject(this._planet);
         
         planetInfo.satelites = planetInfo.satelites || [];
         for (var i = 0; i < planetInfo.satelites.length; i++) {
-            this.addObject(planetInfo.satelites[i]);
+            var satelite = planetInfo.satelites[i];
+            var d = satelite._orbitDistance;
+
+            // fix orbit inclination
+            // TODO create this only once and reuse
+            var orbit = new gx.models.disk(context.glx, d, d - defaultOrbitModelWidth, 50);
+            
+            var orbitPlanet = new gx.drawableObject(context, {
+                model: orbit,
+                texture: texture
+            });
+            
+            this.addObject(satelite);
+            this.addObject(orbitPlanet);
         }
     },
     

@@ -111,44 +111,47 @@ gx.models.face = function (glx, left, right) {
     return new gx.model(glx, m);
 };
 
+/**
+ * Creates a disk on the x-z plane.
+ */
 gx.models.disk = function (glx, outer, inner, slices) {
     var m = new gx.modelData(glx);
 
     // angle for each slice
     var t = Math.PI * 2 / slices;
-    
-    // a is the point on the inner circle, b is the one on the outer
-    var ay = 0;
-    var ax = inner;
-    var by = 0;
-    var bx = outer;
 
-    m.vertices.push(ax, ay, 0);
-    m.vertices.push(bx, by, 0);
-    
-    for (var i = 1; i < slices; i++) {
+    // iterate on each line that divides two slices
+    for (var i = 0; i < slices; i++) {
         var nt = i * t;
         var sin = Math.sin(nt);
         var cos = Math.cos(nt);
-        var ay = inner * sin;
+        var az = inner * sin;
         var ax = inner * cos;
-        var by = outer * sin;
+        var bz = outer * sin;
         var bx = outer * cos;
 
-        // push new vertices calculated
-        m.vertices.push(ax, ay, 0);
-        m.vertices.push(bx, by, 0);
+        // push new vertices calculated on that slice division line
+        m.normals.push(0, 1, 0);
+        m.normals.push(0, 1, 0);
+        m.textureCoords.push(0, 0);
+        m.textureCoords.push(0, 0);
+        
+        m.vertices.push(ax, 0, az); // vextex on inner circunference
+        m.vertices.push(bx, 0, bz); // vertex on outer circunference
 
-        // index quad
-        var index = i * 2;
-        m.indexes.push(index + 0, index + 2, index + 1);
-        m.indexes.push(index + 2, index + 3, index +1);        
+        // index quad that sits on the slice between this line and next line
+        var index = i * 2; // 2 vertices per line
+        m.indexes.push(index + 0, index + 2, index + 1); // left triangle
+        m.indexes.push(index + 2, index + 3, index + 1);  // right triangle
     }
-    
-    // index last quad
-    var index = slices * 2;
-    m.indexes.push(index + 0, 0, index + 1);
-    m.indexes.push(0,         1, index +1);
 
+    // we need to fix last slice as it wraps around back to the first line
+    var index = (slices - 1) * 6;
+    m.indexes[index + 1] = 0;
+    m.indexes[index + 3] = 0;
+    m.indexes[index + 4] = 1;
+    
+    m.createBuffers(glx);
+    
     return new gx.model(glx, m);    
 };
