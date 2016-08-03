@@ -25,6 +25,7 @@
 <script type="text/javascript" src="gx/textureManager.js"></script>
 <script type="text/javascript" src="gx/shader.js"></script>
 <script type="text/javascript" src="gx/phongShader.js"></script>
+<script type="text/javascript" src="gx/delayedShader.js"></script>
 
 <script type="text/javascript" src="game/supernova.js"></script>
 <script type="text/javascript" src="game/mainLoop.js"></script>
@@ -33,6 +34,8 @@
 <script type="text/javascript" src="game/sun.js"></script>
 <script type="text/javascript" src="game/solarSystem.js"></script>
 <script type="text/javascript" src="game/debugPrinter.js"></script>
+<script type="text/javascript" src="game/sunShader.js"></script>
+
 
 <!-- shaders -->
 <script id="main_frag" type="x-shader/x-fragment" src="shaders\main_fragment.glsl"></script>
@@ -58,7 +61,7 @@
 
     <body onload="webGLStart();">
         <div>
-            <canvas id="canvas" style="border: none; margin: 0px"></canvas>
+            <canvas id="canvas" style="border: none; margin: 0px;"></canvas>
         </div>
     </body>
 

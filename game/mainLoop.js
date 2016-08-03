@@ -2,7 +2,7 @@ supernova.mainLoop = gx.mainLoop.extend({
     
     initialize: function(canvas) {
         var shaderDefinition = [
-            { shaderName: 'sun', vertexShaderName: 'main_vert', fragmentShaderName: 'sun2_frag' }
+            { shaderName: 'sun', vertexShaderName: 'sun_vert', fragmentShaderName: 'sun2_frag' }
         ];
         
         var textureDefinition = [

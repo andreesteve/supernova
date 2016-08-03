@@ -1,5 +1,10 @@
 supernova.sun = supernova.planet.extend({
 
+    initialize: function(options) {
+        this.supr(options);
+        this._planet._shader = gx.delayedShader.makeDelayed(new supernova.sunShader());
+    },
+    
     _drawInternal: function(context) {
         var worldMatrix = context.getWorldMatrix();
         var modelMatrix = this._model.getModelMatrix();

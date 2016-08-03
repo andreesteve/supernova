@@ -82,6 +82,9 @@ gx.mainLoop = klass({
         
         this.update(this._context);
         this.draw(this._context);
+
+        gx.delayedShader.drawDelayed(this._context);
+        gx.delayedShader.clearDelayedQueue();        
         
         this._glxInput.tick();
     },

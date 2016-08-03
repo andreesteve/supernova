@@ -1,42 +1,22 @@
 /**
- * Represents a PHONG shader.
+ * Represents a SUN shader.
  */
-gx.phongShader = gx.shader.extend({
-
-    /**
-     * The world matrix.
-     */
-    worldMatrix: null,
-
-    /**
-     * The texture used to render the model.
-     */
-    texture: null,
+supernova.sunShader = gx.phongShader.extend({
     
     /**
-     * Represents a PHONG shader.
+     * Represents a SUN shader.
      * @constructor
      */
-    initialize: function(shaderName) {
-        this.supr(shaderName || "main");
+    initialize: function() {
+        this.supr("sun");
     },    
-
-    draw: function(context, model) {
-        if (this.texture) {
-            this.setTextures([this.texture]);
-        }
-        
-        this.supr(context, model);
-    },
-    
-    _attachTexture: function(shaderProgram, texture, index) {
-        this.supr(shaderProgram, texture, index);
-        shaderProgram.uniform("uSampler2D", 0, 'i');
-    },
     
     _setShaderParameters: function(shaderProgram, context, model) {
-        this.supr(shaderProgram);
+        this.supr(shaderProgram, context, model);
 
+        shaderProgram.uniform2fv('uResolution',
+                                 [context.glx.gl.canvas.width, context.glx.gl.canvas.height]);
+/*
         var normalMatrix = mat3.create();
         mat3.normalFromMat4(normalMatrix, this.worldMatrix);
         
@@ -50,5 +30,6 @@ gx.phongShader = gx.shader.extend({
         shaderProgram.attributeBuffer("aVertexPosition", model.modelData.vertexBuffer);
         shaderProgram.attributeBuffer("aTexCoord", model.modelData.texCoordBuffer);
         shaderProgram.attributeBuffer("aNormal", model.modelData.normalBuffer);        
+*/
     }
 });
