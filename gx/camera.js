@@ -1,6 +1,6 @@
 var glmatrix = require('gl-matrix');
 var mat4 = glmatrix.mat4;
-var vec3 = glmatrix = vec3;
+var vec3 = glmatrix.vec3;
 
 var camera = function(position) {
     this._position = position || [0, 0, 0];

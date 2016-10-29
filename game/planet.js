@@ -2,7 +2,13 @@ var defaultLatEdgeSize = 50;
 var defaultLongEdgeSize = 30;
 var defaultOrbitModelWidth = 0.1;
 
+var glmatrix = require('gl-matrix');
+var mat4 = glmatrix.mat4;
+var mat3 = glmatrix.mat4;
+var vec3 = glmatrix.vec3;
+
 var gx = require('../gx');
+var Orbit = require('./orbit.js');
 
 var planet = gx.scene.extend({
 
@@ -24,7 +30,7 @@ var planet = gx.scene.extend({
         var texture = context.textureManager.getTexture(planetInfo.textureName);
 
         if (planetInfo.orbitDistance) {
-            this._orbit = new supernova.orbit(context, {
+            this._orbit = new Orbit(context, {
                 period: planetInfo.orbitPeriod,
                 inclination: planetInfo.orbitInclination,
                 radius: planetInfo.orbitDistance

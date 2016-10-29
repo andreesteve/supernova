@@ -35,3 +35,5 @@ var sunShader = gx.phongShader.extend({
 */
     }
 });
+
+module.exports = sunShader;

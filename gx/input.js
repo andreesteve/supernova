@@ -1,5 +1,5 @@
 var glmatrix = require('gl-matrix');
-var vec2 = glmatrix = vec2;
+var vec2 = glmatrix.vec2;
 
 var input = function(canvas) {    
     this.currentKeys = [];

@@ -110,8 +110,8 @@ gx.prototype.loadShaders = function(onLoadComplete) {
 *   vertexShader: gxShader
 */
 gx.prototype.createShaderProgram = function(vertexShader, fragmentShader) {
-    var shaderProgram = new shaderProgram(this.gl, vertexShader, fragmentShader);
-    return shaderProgram;
+    var sp = new shaderProgram(this.gl, vertexShader, fragmentShader);
+    return sp;
 };
 
 gx.prototype.createBuffer = function(itemSize, elementArray, bufferType) {   
@@ -120,11 +120,11 @@ gx.prototype.createBuffer = function(itemSize, elementArray, bufferType) {
         bType = this.gl[bufferType];
     }
     
-    var buffer = new buffer(this.gl, itemSize, bType);
+    var b = new buffer(this.gl, itemSize, bType);
     
-    buffer.fill(elementArray);
+    b.fill(elementArray);
     
-    return buffer;
+    return b;
 };
 
 // TODO: review this for nodejs
@@ -132,8 +132,8 @@ gx.prototype.createTexture = function(url, onLoadComplete) {
     var img = new Image();
 	    
 	img.onload = function() {
-        var texture = new texture(this.gl, img);
-		onLoadComplete(texture);
+        var tex = new texture(this.gl, img);
+		onLoadComplete(tex);
 	}.bind(this);
     
     img.src = url;

@@ -1,3 +1,6 @@
+var model = require("./model.js");
+var shaderUnit = require("./shaderUnit.js");
+
 module.exports = {
     gx: require("./gx.js"),
     buffer: require("./buffer.js"),
@@ -9,7 +12,9 @@ module.exports = {
     index: require("./index.js"),
     input: require("./input.js"),
     mainLoop: require("./mainLoop.js"),
-    model: require("./model.js"),
+    model: model.model,
+    modelData: model.modelData,
+    models: model.models,
     object: require("./object.js"),
     overlay2d: require("./overlay2d.js"),
     phongShader: require("./phongShader.js"),
@@ -18,7 +23,8 @@ module.exports = {
     scene: require("./scene.js"),
     shader: require("./shader.js"),
     shaderManager: require("./shaderManager.js"),
-    shaderUnit: require("./shaderUnit.js"),
+    shaderUnit: shaderUnit.shaderUnit,
+    shaderProgram: shaderUnit.shaderProgram,
     texture: require("./texture.js"),
     textureManager: require("./textureManager.js"),
 };

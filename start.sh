@@ -1,1 +1,3 @@
-chromium --disable-web-security --user-data-dir=/tmp/sp index.html
+#!/bin/sh
+sleep 1 && chromium http://localhost:9966 &
+beefy game/index.js:out/bundle.js

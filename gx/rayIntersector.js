@@ -1,6 +1,6 @@
 var klass = require('klass');
 var glmatrix = require('gl-matrix');
-var vec3 = glmatrix = vec3;
+var vec3 = glmatrix.vec3;
 
 var rayIntersector = klass({
     initialize: function(options) {

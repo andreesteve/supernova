@@ -1,8 +1,8 @@
 var klass = require('klass');
 var glmatrix = require('gl-matrix');
 var mat4 = glmatrix.mat4;
-var vec3 = glmatrix = vec3;
-var vec4 = glmatrix = vec4;
+var vec3 = glmatrix.vec3;
+var vec4 = glmatrix.vec4;
 
 var projectionHelper = klass({
     initialize: function(glx) {

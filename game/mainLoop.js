@@ -1,12 +1,12 @@
 var gx = require('../gx');
 var glmatrix = require('gl-matrix');
 var mat4 = glmatrix.mat4;
-var vec3 = glmatrix = vec3;
+var vec3 = glmatrix.vec3;
 
 var debugPrinter = require('./debugPrinter.js');
 var solarSystem = require('./solarSystem.js');
 var planet = require('./planet.js');
-var sun = require('./sun.js');
+var Sun = require('./sun.js');
 
 var mainLoop = gx.mainLoop.extend({
     
@@ -124,9 +124,9 @@ var mainLoop = gx.mainLoop.extend({
     },
     
     _setupScene: function(context) {
-        var scene = new supernova.solarSystem();        
+        var scene = new solarSystem();        
                    
-        var moon = new supernova.planet({
+        var moon = new planet({
             context: context,
             planetRadius: 0.3,
             rotationPeriod: 1000,
@@ -136,7 +136,7 @@ var mainLoop = gx.mainLoop.extend({
             textureName: 'moon'
         });
         
-        var earth = new supernova.planet({
+        var earth = new planet({
             context: context,
             planetRadius: 0.8,
             rotationPeriod: 1000,
@@ -147,7 +147,7 @@ var mainLoop = gx.mainLoop.extend({
             satelites: [ moon ]
         });
         
-        var jupiter = new supernova.planet({
+        var jupiter = new planet({
             context: context,
             planetRadius: 2,
             rotationPeriod: 1000,
@@ -162,7 +162,7 @@ var mainLoop = gx.mainLoop.extend({
             return "earth: " + me._debug.formatArray(earth.getPosition());
         });
         
-        var sun = new supernova.sun({
+        var sun = new Sun({
             context: context,
             planetRadius: 1,
             rotationPeriod: 1000,

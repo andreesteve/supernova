@@ -1,4 +1,14 @@
 var klass = require('klass');
+var glmatrix = require('gl-matrix');
+var mat4 = glmatrix.mat4;
+
+var gx = require('./gx.js');
+var input = require('./input.js');
+var drawingContext = require('./drawingContext.js');
+var camera = require('./camera.js');
+var shaderManager = require('./shaderManager.js');
+var textureManager = require('./textureManager.js');
+var delayedShader = require('./delayedShader.js');
 
 var mainLoop = klass({
     /**
@@ -28,15 +38,15 @@ var mainLoop = klass({
         
         this._glx = new gx();
         this._glx.initializeWebgl(canvas);
-        this._glxInput = new gx.input(canvas);
+        this._glxInput = new input(canvas);
         
-        this._context = new gx.drawingContext({
-            camera: new gx.camera(),
+        this._context = new drawingContext({
+            camera: new camera(),
             projectionMatrix: this._createProjection(canvas, options.projection),
             glx: this._glx,
             glxInput: this._glxInput,
-            shaderManager: new gx.shaderManager(this._glx),
-            textureManager: new gx.textureManager(this._glx, 'assets/textures/')
+            shaderManager: new shaderManager(this._glx),
+            textureManager: new textureManager(this._glx, 'assets/textures/')
         });
     },
     
@@ -85,8 +95,8 @@ var mainLoop = klass({
         this.update(this._context);
         this.draw(this._context);
 
-        gx.delayedShader.drawDelayed(this._context);
-        gx.delayedShader.clearDelayedQueue();        
+        delayedShader.drawDelayed(this._context);
+        delayedShader.clearDelayedQueue();        
         
         this._glxInput.tick();
     },
