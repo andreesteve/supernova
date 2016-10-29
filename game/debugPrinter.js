@@ -1,4 +1,6 @@
-supernova.debugPrinter = gx.object.extend({
+var gx = require('../gx');
+
+var debugPrinter = gx.object.extend({
     initialize: function(options) {
         this.supr();
         
@@ -70,3 +72,5 @@ supernova.debugPrinter = gx.object.extend({
         }
     }
 });
+
+module.exports = debugPrinter;

@@ -2,7 +2,9 @@ var defaultLatEdgeSize = 50;
 var defaultLongEdgeSize = 30;
 var defaultOrbitModelWidth = 0.1;
 
-supernova.planet = gx.scene.extend({
+var gx = require('../gx');
+
+var planet = gx.scene.extend({
 
     initialize: function(planetInfo) {
         this.supr();
@@ -67,3 +69,5 @@ supernova.planet = gx.scene.extend({
         this.supr(context);                      
     }
 });
+
+module.exports = platnet;

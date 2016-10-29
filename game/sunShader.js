@@ -1,7 +1,9 @@
+var gx = require('../gx');
+
 /**
  * Represents a SUN shader.
  */
-supernova.sunShader = gx.phongShader.extend({
+var sunShader = gx.phongShader.extend({
     
     /**
      * Represents a SUN shader.

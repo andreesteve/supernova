@@ -1,8 +1,17 @@
-supernova.sun = supernova.planet.extend({
+var gx = require('../gx');
+var glmatrix = require('gl-matrix');
+var mat4 = glmatrix.mat4;
+var mat3 = glmatrix.mat4;
+var vec3 = glmatrix = vec3;
+
+var planet = require('./planet.js');
+var sunShader = require('./sunShader.js');
+
+var sun = planet.extend({
 
     initialize: function(options) {
         this.supr(options);
-        this._planet._shader = gx.delayedShader.makeDelayed(new supernova.sunShader());
+        this._planet._shader = gx.delayedShader.makeDelayed(new sunShader());
     },
     
     _drawInternal: function(context) {

@@ -1,4 +1,11 @@
-supernova.orbit = gx.drawableObject.extend({
+var gx = require('../gx');
+var glmatrix = require('gl-matrix');
+var mat4 = glmatrix.mat4;
+var mat3 = glmatrix.mat4;
+var vec3 = glmatrix = vec3;
+var vec4 = glmatrix = vec4;
+
+var orbit = gx.drawableObject.extend({
 
     /**
      * Initializes the orbit.
@@ -54,3 +61,5 @@ supernova.orbit = gx.drawableObject.extend({
         return position;
     }
 });
+
+module.exports = orbit;

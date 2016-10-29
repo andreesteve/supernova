@@ -1,4 +1,6 @@
-supernova.solarSystem = gx.scene.extend({
+var gx = require('../gx');
+
+var solarSystem = gx.scene.extend({
 
     initialize: function() {
         this.supr();
@@ -12,3 +14,5 @@ supernova.solarSystem = gx.scene.extend({
         this.supr(context);
     }
 });
+
+module.exports = solarSystem;

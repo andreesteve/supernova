@@ -1,4 +1,14 @@
-supernova.mainLoop = gx.mainLoop.extend({
+var gx = require('../gx');
+var glmatrix = require('gl-matrix');
+var mat4 = glmatrix.mat4;
+var vec3 = glmatrix = vec3;
+
+var debugPrinter = require('./debugPrinter.js');
+var solarSystem = require('./solarSystem.js');
+var planet = require('./planet.js');
+var sun = require('./sun.js');
+
+var mainLoop = gx.mainLoop.extend({
     
     initialize: function(canvas) {
         var shaderDefinition = [
@@ -38,7 +48,7 @@ supernova.mainLoop = gx.mainLoop.extend({
             color: 'white'
         });
         
-        this._debug = new supernova.debugPrinter({
+        this._debug = new debugPrinter({
             canvas: canvas
         });
         
