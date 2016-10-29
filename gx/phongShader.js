@@ -1,7 +1,7 @@
 var shader = require('./shader.js');
 var glmatrix = require('gl-matrix');
 var mat4 = glmatrix.mat4;
-var vec3 = glmatrix = vec3;
+var vec3 = glmatrix.vec3;
 var mat3 = glmatrix.mat3;
 
 /**

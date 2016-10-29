@@ -63,3 +63,5 @@ var object = klass({
         return worldMatrix;
     }    
 });
+
+module.exports = object;
