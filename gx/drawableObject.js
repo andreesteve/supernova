@@ -1,5 +1,5 @@
-var object = require('./object');
-var phongShader = require('./phongShader');
+var object = require('./object.js');
+var phongShader = require('./phongShader.js');
 
 var drawableObject = object.extend({
 

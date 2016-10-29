@@ -1,10 +1,10 @@
 Math.PI2 = 2 * Math.PI;
 Math.Degree = Math.PI / 180;
 
-var shaderUnit = require('./shaderUnit').shaderUnit;
-var shaderProgram = require('./shaderUnit').shaderProgram;
-var buffer = require('./buffer');
-var texture = require('./texture');
+var shaderUnit = require('./shaderUnit.js').shaderUnit;
+var shaderProgram = require('./shaderUnit.js').shaderProgram;
+var buffer = require('./buffer.js');
+var texture = require('./texture.js');
 
 var gx = function(gl) {
     this.gl = gl;

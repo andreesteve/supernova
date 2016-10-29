@@ -1,4 +1,4 @@
-var shader = require('./shader');
+var shader = require('./shader.js');
 var glmatrix = require('gl-matrix');
 var mat4 = glmatrix.mat4;
 var vec3 = glmatrix = vec3;

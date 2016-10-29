@@ -1,5 +1,5 @@
 var klass = require('klass');
-var projectionHelper = require('./projectionHelper');
+var projectionHelper = require('./projectionHelper.js');
 var glmatrix = require('gl-matrix');
 var mat4 = glmatrix.mat4;
 

@@ -1,4 +1,4 @@
-var object = require('./object');
+var object = require('./object.js');
 
 var scene = object.extend({
 
