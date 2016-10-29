@@ -1,0 +1,16 @@
+{
+  "name": "gx",
+  "version": "1.0.0",
+  "description": "A javascript webgl library",
+  "main": "index.js",
+  "dependencies": {
+    "gl-matrix": "^2.3.2",
+    "klass": "^1.4.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
