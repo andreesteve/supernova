@@ -255,3 +255,5 @@ var mainLoop = gx.mainLoop.extend({
         camera.move(cameraDisplacement);
     }
 });
+
+module.exports = mainLoop;

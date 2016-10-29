@@ -70,4 +70,4 @@ var planet = gx.scene.extend({
     }
 });
 
-module.exports = platnet;
+module.exports = planet;
