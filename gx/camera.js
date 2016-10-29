@@ -1,4 +1,8 @@
-gx.camera = function(position) {
+var glmatrix = require('gl-matrix');
+var mat4 = glmatrix.mat4;
+var vec3 = glmatrix = vec3;
+
+var camera = function(position) {
     this._position = position || [0, 0, 0];
     this._target = [0, 0, 1];
     this._forward = [0, 0, 1];
@@ -6,7 +10,7 @@ gx.camera = function(position) {
     this.lockOnTarget = false;
 };
 
-gx.camera.prototype.getViewMatrix = function() {
+camera.prototype.getViewMatrix = function() {
     var view = mat4.create();
     mat4.lookAt(view, this._position, this._target, this._up);
     
@@ -18,7 +22,7 @@ gx.camera.prototype.getViewMatrix = function() {
 *   That is the vector that points on the direction of the camera's target from the camera's position.
 *   The vector is based on the origin.
 */
-gx.camera.prototype.getForward = function() {
+camera.prototype.getForward = function() {
     /*var lookDirection = vec3.create();
 
     if (this.lockOnTarget) {
@@ -30,7 +34,7 @@ gx.camera.prototype.getForward = function() {
     return this._forward;
 };
 
-gx.camera.prototype.setPosition = function(position) {
+camera.prototype.setPosition = function(position) {
 
     var displacement = vec3.create();
     vec3.sub(displacement, position, this._position);
@@ -40,11 +44,11 @@ gx.camera.prototype.setPosition = function(position) {
     this._updateTarget();
 };
 
-gx.camera.prototype.getPosition = function() {
+camera.prototype.getPosition = function() {
     return vec3.clone(this._position);
 };
 
-gx.camera.prototype.setTarget = function(target) {
+camera.prototype.setTarget = function(target) {
 
     this._target = target;
     
@@ -61,7 +65,7 @@ gx.camera.prototype.setTarget = function(target) {
     vec3.transformMat4(this._up, this._forward, rot90degreeX);
 };
 
-gx.camera.prototype.move = function(displacement) {
+camera.prototype.move = function(displacement) {
     
     var move = vec3.create();
     var temp = vec3.create();
@@ -85,7 +89,7 @@ gx.camera.prototype.move = function(displacement) {
     this._updateTarget();
 };
 
-gx.camera.prototype.rotate = function(pitch, yaw, roll) {
+camera.prototype.rotate = function(pitch, yaw, roll) {
 
     var rot = mat4.create();
     mat4.identity(rot);
@@ -108,13 +112,13 @@ gx.camera.prototype.rotate = function(pitch, yaw, roll) {
     this._updateTarget();
 };
 
-gx.camera.prototype._getSide = function() {
+camera.prototype._getSide = function() {
     var side = vec3.create();
     vec3.cross(side, this._forward, this._up);       
     return side;
 };
 
-gx.camera.prototype._updateTarget = function() {
+camera.prototype._updateTarget = function() {
 /*    if (this.lockOnTarget ||
         (displacement[0] == 0 && displacement[1] == 0 && displacement[2] == 0)) {
         return;
@@ -122,3 +126,5 @@ gx.camera.prototype._updateTarget = function() {
     
     vec3.add(this._target, this._position, this._forward);
 };
+
+module.exports = camera;

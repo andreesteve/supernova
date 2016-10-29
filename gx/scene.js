@@ -1,4 +1,6 @@
-gx.scene = gx.object.extend({
+var object = require('./object');
+
+var scene = object.extend({
 
     initialize: function() {
         this.supr();
@@ -45,3 +47,5 @@ gx.scene = gx.object.extend({
         return false;
     },
 });
+
+module.exports = scene;

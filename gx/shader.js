@@ -1,7 +1,9 @@
+var klass = require('klass');
+
 /**
  * Represents a shader that can render models.
  */
-gx.shader = klass({
+var shader = klass({
     /**
      * Represents a shader that can render models.
      * @constructor
@@ -47,3 +49,5 @@ gx.shader = klass({
         }
     }
 });
+
+module.exports = shader;

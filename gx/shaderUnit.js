@@ -1,14 +1,14 @@
 /**
 *   type = gl.FRAGMENT_SHADER | gl.VERTEX_SHADER
 */
-gx.shaderUnit = function(shaderId, shaderString, type) {
+var shaderUnit = function(shaderId, shaderString, type) {
     this.id = shaderId;
     this.glShader = null;
     this.shaderString = shaderString;
     this.shaderType = type;
 };
 
-gx.shaderUnit.prototype.compile = function(gl) {
+shaderUnit.prototype.compile = function(gl) {
     this.glShader = gl.createShader(this.shaderType);
     
     gl.shaderSource(this.glShader, this.shaderString);
@@ -22,14 +22,14 @@ gx.shaderUnit.prototype.compile = function(gl) {
 
 /* SHADER PROGRAM */
 
-gx.shaderProgram = function(gl, vertexShader, fragmentShader) {
+var shaderProgram = function(gl, vertexShader, fragmentShader) {
     this.vertexShader = vertexShader;
     this.fragmentShader = fragmentShader;
     this.glShaderProgram = null;
     this.gl = gl;
 };
 
-gx.shaderProgram.prototype.linkProgram = function() {   
+shaderProgram.prototype.linkProgram = function() {   
     this.glShaderProgram = this.gl.createProgram();
     
     this.gl.attachShader(this.glShaderProgram, this.vertexShader.glShader);
@@ -41,11 +41,11 @@ gx.shaderProgram.prototype.linkProgram = function() {
     }
 };
 
-gx.shaderProgram.prototype.activate = function() {
+shaderProgram.prototype.activate = function() {
     this.gl.useProgram(this.glShaderProgram);
 };
 
-gx.shaderProgram.prototype.attributeBuffer = function(attributeName, buffer) {  
+shaderProgram.prototype.attributeBuffer = function(attributeName, buffer) {  
     var attributeLocation = this.gl.getAttribLocation(this.glShaderProgram, attributeName);    
     this.gl.enableVertexAttribArray(attributeLocation);
         
@@ -53,7 +53,7 @@ gx.shaderProgram.prototype.attributeBuffer = function(attributeName, buffer) {
     this.gl.vertexAttribPointer(attributeLocation, buffer.itemSize, buffer.dataType, false, 0, 0);
 };
 
-gx.shaderProgram.prototype.uniform = function(uniformName, value, type) {
+shaderProgram.prototype.uniform = function(uniformName, value, type) {
     // TODO: review this, make 1-to-1 to webgl methods
     type = type || 'f';
     
@@ -73,17 +73,17 @@ gx.shaderProgram.prototype.uniform = function(uniformName, value, type) {
     }
 };
 
-gx.shaderProgram.prototype.uniform3fv = function(uniformName, value) {
+shaderProgram.prototype.uniform3fv = function(uniformName, value) {
     var uniformLocation = this.gl.getUniformLocation(this.glShaderProgram, uniformName);
     this.gl.uniform3fv(uniformLocation, value);
 };
 
-gx.shaderProgram.prototype.uniform2fv = function(uniformName, value) {
+shaderProgram.prototype.uniform2fv = function(uniformName, value) {
     var uniformLocation = this.gl.getUniformLocation(this.glShaderProgram, uniformName);
     this.gl.uniform2fv(uniformLocation, value);
 };
 
-gx.shaderProgram.prototype.uniformMatrix = function(uniformName, value, type) {
+shaderProgram.prototype.uniformMatrix = function(uniformName, value, type) {
     var uniformLocation = this.gl.getUniformLocation(this.glShaderProgram, uniformName);
     
     if (value.length == 16) {
@@ -93,11 +93,16 @@ gx.shaderProgram.prototype.uniformMatrix = function(uniformName, value, type) {
     }    
 };
 
-gx.shaderProgram.prototype.drawArrays = function(count) {
+shaderProgram.prototype.drawArrays = function(count) {
     this.gl.drawArrays(this.gl.TRIANGLES, 0, count);
 };
 
-gx.shaderProgram.prototype.drawElements = function(indexBuffer) {
+shaderProgram.prototype.drawElements = function(indexBuffer) {
     indexBuffer.activate();    
     this.gl.drawElements(this.gl.TRIANGLES, indexBuffer.count, indexBuffer.dataType, 0);
+};
+
+module.exports = {
+    shaderProgram: shaderProgram,
+    shaderUnit: shaderUnit
 };

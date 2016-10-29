@@ -1,4 +1,4 @@
-gx.buffer = function(gl, itemSize, bufferType) {
+var buffer = function(gl, itemSize, bufferType) {
     this.glBuffer = gl.createBuffer();
     this.itemSize = itemSize;
     this.hint = gl.STATIC_DRAW;
@@ -14,7 +14,7 @@ gx.buffer = function(gl, itemSize, bufferType) {
     }
 };
 
-gx.buffer.prototype.fill = function(data) {
+buffer.prototype.fill = function(data) {
     this.count = data.length / this.itemSize;
     
     var formatedData = data instanceof this.arrayType 
@@ -25,6 +25,8 @@ gx.buffer.prototype.fill = function(data) {
     this.gl.bufferData(this.bufferType, formatedData, this.hint);
 };
 
-gx.buffer.prototype.activate = function() {
+buffer.prototype.activate = function() {
     this.gl.bindBuffer(this.bufferType, this.glBuffer);
 };
+
+module.exports = buffer;

@@ -1,7 +1,13 @@
+var shader = require('./shader');
+var glmatrix = require('gl-matrix');
+var mat4 = glmatrix.mat4;
+var vec3 = glmatrix = vec3;
+var mat3 = glmatrix.mat3;
+
 /**
  * Represents a PHONG shader.
  */
-gx.phongShader = gx.shader.extend({
+var phongShader = shader.extend({
 
     /**
      * The world matrix.
@@ -52,3 +58,5 @@ gx.phongShader = gx.shader.extend({
         shaderProgram.attributeBuffer("aNormal", model.modelData.normalBuffer);        
     }
 });
+
+module.exports = phongShader;

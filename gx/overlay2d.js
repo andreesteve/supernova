@@ -1,4 +1,6 @@
-gx.overlay2d = klass({
+var klass = require('klass');
+
+var overlay2d = klass({
 
     initialize: function(options) {
         var canvas = options.canvas;
@@ -89,3 +91,5 @@ gx.overlay2d = klass({
         return canvas;
     }
 });
+
+module.exports = overlay2d;

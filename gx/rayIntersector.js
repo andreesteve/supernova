@@ -1,4 +1,8 @@
-gx.rayIntersector = klass({
+var klass = require('klass');
+var glmatrix = require('gl-matrix');
+var vec3 = glmatrix = vec3;
+
+var rayIntersector = klass({
     initialize: function(options) {
         this._rayOrigin = options.rayOrigin;
         this._rayDirection = options.rayDirection;
@@ -48,3 +52,5 @@ gx.rayIntersector = klass({
         return true;
     },
 });
+
+module.exports =  rayIntersector;

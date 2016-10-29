@@ -1,4 +1,7 @@
-gx.drawableObject = gx.object.extend({
+var object = require('./object');
+var phongShader = require('./phongShader');
+
+var drawableObject = object.extend({
 
     /**
      * @constructor.
@@ -13,7 +16,7 @@ gx.drawableObject = gx.object.extend({
 
         this._model = options.model;
         this._texture = options.texture;
-        this._shader = options.shader || new gx.phongShader();
+        this._shader = options.shader || new phongShader();
     },
     
     draw: function(context) {
@@ -24,3 +27,5 @@ gx.drawableObject = gx.object.extend({
         this._shader.draw(context, this._model);
     }
 });
+
+module.exports = drawableObject;

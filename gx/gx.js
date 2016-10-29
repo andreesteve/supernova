@@ -1,7 +1,12 @@
 Math.PI2 = 2 * Math.PI;
 Math.Degree = Math.PI / 180;
 
-gx = function(gl) {
+var shaderUnit = require('./shaderUnit').shaderUnit;
+var shaderProgram = require('./shaderUnit').shaderProgram;
+var buffer = require('./buffer');
+var texture = require('./texture');
+
+var gx = function(gl) {
     this.gl = gl;
 };
 
@@ -22,7 +27,7 @@ gx.prototype.loadShaders = function(onLoadComplete) {
     var me = this;
     
     function createShader(shaderString, shaderType, shaderId) {
-        var gxShader = new gx.shaderUnit(shaderId, shaderString, shaderType);
+        var gxShader = new shaderUnit(shaderId, shaderString, shaderType);
         
         gxShader.compile(me.gl);
                
@@ -105,7 +110,7 @@ gx.prototype.loadShaders = function(onLoadComplete) {
 *   vertexShader: gxShader
 */
 gx.prototype.createShaderProgram = function(vertexShader, fragmentShader) {
-    var shaderProgram = new gx.shaderProgram(this.gl, vertexShader, fragmentShader);
+    var shaderProgram = new shaderProgram(this.gl, vertexShader, fragmentShader);
     return shaderProgram;
 };
 
@@ -115,20 +120,23 @@ gx.prototype.createBuffer = function(itemSize, elementArray, bufferType) {
         bType = this.gl[bufferType];
     }
     
-    var buffer = new gx.buffer(this.gl, itemSize, bType);
+    var buffer = new buffer(this.gl, itemSize, bType);
     
     buffer.fill(elementArray);
     
     return buffer;
 };
 
+// TODO: review this for nodejs
 gx.prototype.createTexture = function(url, onLoadComplete) {
     var img = new Image();
 	    
 	img.onload = function() {
-        var texture = new gx.texture(this.gl, img);
+        var texture = new texture(this.gl, img);
 		onLoadComplete(texture);
 	}.bind(this);
     
     img.src = url;
 };
+
+module.exports = gx;

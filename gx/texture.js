@@ -1,4 +1,4 @@
-gx.texture = function(gl, image) {
+var texture = function(gl, image) {
     this.gl = gl;
     this.glTexture = gl.createTexture();
     this.target = gl.TEXTURE_2D;
@@ -9,7 +9,7 @@ gx.texture = function(gl, image) {
     gl.texParameteri(this.target, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
 };
 
-gx.texture.prototype.setImage = function(image) {
+texture.prototype.setImage = function(image) {
     this.activate();
     
     this.gl.texImage2D(
@@ -23,15 +23,17 @@ gx.texture.prototype.setImage = function(image) {
     this.generateMipmap();
 };
 
-gx.texture.prototype.activate = function() {
+texture.prototype.activate = function() {
     this.gl.bindTexture(this.target, this.glTexture);    
 };
 
-gx.texture.prototype.attach = function(textureIndex) {
+texture.prototype.attach = function(textureIndex) {
     this.gl.activeTexture(this.gl.TEXTURE0 + textureIndex);
     this.activate();
 };
 
-gx.texture.prototype.generateMipmap = function() {
+texture.prototype.generateMipmap = function() {
     this.gl.generateMipmap(this.target);
 };
+
+module.exports = texture;

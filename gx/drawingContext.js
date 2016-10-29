@@ -1,4 +1,9 @@
-gx.drawingContext = klass({
+var klass = require('klass');
+var projectionHelper = require('./projectionHelper');
+var glmatrix = require('gl-matrix');
+var mat4 = glmatrix.mat4;
+
+var drawingContext = klass({
     initialize: function(options) {        
         this.glx = options.glx;
         this.glxInput = options.glxInput;        
@@ -10,7 +15,7 @@ gx.drawingContext = klass({
         this._worldMatrixStack = [];        
         this._camera = options.camera;
         this._projectionMatrix = options.projectionMatrix;
-        this._projectionHelper = new gx.projectionHelper(this.glx);
+        this._projectionHelper = new projectionHelper(this.glx);
 
         this.shaderManager = options.shaderManager;
         this.textureManager = options.textureManager;
@@ -62,3 +67,5 @@ gx.drawingContext = klass({
         this.viewProjectionMatrix = viewProjectionMatrix;
     }
 });
+
+module.exports = drawingContext;

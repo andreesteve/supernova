@@ -1,4 +1,6 @@
-gx.shaderManager = klass({
+var klass = require('klass');
+
+var shaderManager = klass({
     initialize: function(glx) {    
         this._glx = glx;
         this._preparedShaders = {};
@@ -40,3 +42,5 @@ gx.shaderManager = klass({
         this._preparedShaders[programName] = program;
     }
 });
+
+module.exports = shaderManager;

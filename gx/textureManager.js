@@ -1,4 +1,6 @@
-gx.textureManager = klass({
+var klass = require('klass');
+
+var textureManager = klass({
     initialize: function(glx, basePath) {    
         this._glx = glx;
         this._basePath = basePath || "";
@@ -33,3 +35,5 @@ gx.textureManager = klass({
         }.bind(this));
     }
 });
+
+module.exports = textureManager;

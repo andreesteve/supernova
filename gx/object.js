@@ -1,4 +1,9 @@
-gx.object = klass({
+var klass = require('klass');
+var glmatrix = require('gl-matrix');
+var mat4 = glmatrix.mat4;
+var vec3 = glmatrix = vec3;
+
+var object = klass({
     initialize: function() {
         this._position = vec3.create();
         this._rotation = vec3.create();

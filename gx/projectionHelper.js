@@ -1,4 +1,10 @@
-gx.projectionHelper = klass({
+var klass = require('klass');
+var glmatrix = require('gl-matrix');
+var mat4 = glmatrix.mat4;
+var vec3 = glmatrix = vec3;
+var vec4 = glmatrix = vec4;
+
+var projectionHelper = klass({
     initialize: function(glx) {
 
         var canvas = glx.gl.canvas;
@@ -29,7 +35,7 @@ gx.projectionHelper = klass({
         vec4.transformMat4(directionWorldCoords, directionScreenCoords, inverse);
         
         var w = directionWorldCoords[3];
-        var directionWorldCoords = vec3.fromValues(directionWorldCoords[0] / w, directionWorldCoords[1] / w, directionWorldCoords[2] / w);
+        directionWorldCoords = vec3.fromValues(directionWorldCoords[0] / w, directionWorldCoords[1] / w, directionWorldCoords[2] / w);
         
         return directionWorldCoords;
     },
@@ -51,5 +57,7 @@ gx.projectionHelper = klass({
         drawingPoint[1] *= this._viewportToDrawingResolutionRatio[1];
         
         return this.unproject(drawingPoint);
-    },
+    }
 });
+
+module.exports = projectionHelper;

@@ -1,4 +1,6 @@
-gx.mainLoop = klass({
+var klass = require('klass');
+
+var mainLoop = klass({
     /**
      * Initializes the main loop class.
      * @constructor
@@ -103,3 +105,5 @@ gx.mainLoop = klass({
         return projectionMatrix;
     }
 });
+
+module.exports = mainLoop;
